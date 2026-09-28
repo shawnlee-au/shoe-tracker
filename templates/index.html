@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset='UTF-8'>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>ShoeTracker Pro</title>
     <style>
-        body { font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif; padding: 40px 20px; background: #f1f5f9; color: #0f172a; user-select: none; margin: 0; }
+        body { font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif; padding: 40px 20px; background: #f1f5f9; color: #0f172a; user-select: none; margin: 0; -webkit-tap-highlight-color: transparent; }
         .card { background: #ffffff; padding: 40px; border-radius: 28px; max-width: 900px; margin: auto; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.8); }
         h2 { text-align: center; font-size: 26px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; margin-bottom: 35px; margin-top: 0; }
         .input-group { margin-bottom: 30px; position: relative; }
@@ -12,12 +15,10 @@
         input[type='text'] { padding: 16px 20px; width: 100%; border: 1.5px solid #e2e8f0; border-radius: 14px; font-size: 16px; font-weight: 500; background: #f8fafc; color: #0f172a; box-sizing: border-box; outline: none; transition: all 0.25s; }
         input[type='text']:focus { border-color: #3b82f6; background: #ffffff; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); }
         
-        /* Clean Checkboxes */
         .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 15px; }
         .chk-wrapper { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #334155; cursor: pointer; }
         .chk-wrapper input[type='checkbox'] { width: 18px; height: 18px; cursor: pointer; accent-color: #3b82f6; }
 
-        /* Size & Scan Row Fixed Layout */
         .size-action-row { display: flex; gap: 20px; align-items: center; }
         .picker-container { flex: 1; display: flex; justify-content: center; align-items: center; height: 160px; background: #f8fafc; border-radius: 20px; border: 1.5px solid #e2e8f0; position: relative; -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%); mask-image: linear-gradient(to bottom, transparent, black 25%, black 75%, transparent); transition: opacity 0.3s; min-width: 200px; }
         .picker-container.locked { pointer-events: none; opacity: 0.5; }
@@ -28,7 +29,6 @@
         .wheel-item { height: 46px; line-height: 46px; text-align: center; font-size: 17px; font-weight: 600; color: #94a3b8; scroll-snap-align: center; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); transform: scale(0.85); opacity: 0.4; }
         .wheel-item.selected { color: #0f172a; font-size: 21px; font-weight: 800; transform: scale(1.05); opacity: 1; }
 
-        /* Physical Scan Button Fixed Ratio */
         .btn-primary { flex: 0 0 140px; height: 160px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(to bottom, #1e293b, #0f172a); border: 1px solid #334155; border-radius: 20px; color: white; font-weight: 800; font-size: 15px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; box-shadow: 0 6px 0 #020617, 0 15px 20px rgba(0,0,0,0.2); transition: all 0.1s; }
         .btn-primary:active { transform: translateY(6px); box-shadow: 0 0 0 #020617, 0 5px 10px rgba(0,0,0,0.2); height: 160px; }
         .btn-stop { background: linear-gradient(to bottom, #ef4444, #dc2626) !important; border: 1px solid #b91c1c !important; box-shadow: 0 6px 0 #7f1d1d, 0 15px 20px rgba(239, 68, 68, 0.3) !important; }
@@ -43,6 +43,7 @@
         .history-item { padding: 12px 20px; cursor: pointer; font-size: 15px; font-weight: 500; color: #334155; transition: 0.15s; }
         .history-item:hover { background: #f8fafc; color: #3b82f6; padding-left: 24px; font-weight: 600; }
 
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
         table { width: 100%; border-collapse: separate; border-spacing: 0 12px; margin-top: 15px; }
         th { font-size: 12px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; padding: 0 20px 8px 20px; border: none; }
         td { background: #ffffff; padding: 20px; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
@@ -54,65 +55,93 @@
         .badge { padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 800; color: white; letter-spacing: 0.5px; white-space: nowrap; }
         .btn-link { padding: 8px 20px; background: #e0f2fe; color: #0284c7; text-decoration: none; border-radius: 100px; font-size: 13px; font-weight: 800; display: inline-block; transition: all 0.2s; white-space: nowrap; }
         .btn-link:hover { background: #0284c7; color: white; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(2, 132, 199, 0.3); }
+
+        /* 🔥 MOBILE RESPONSIVE STYLES (아이폰용 뷰포트 설정) 🔥 */
+        @media (max-width: 600px) {
+            body { padding: 15px 10px 40px 10px; }
+            .card { padding: 25px 15px; border-radius: 20px; }
+            h2 { font-size: 22px; margin-bottom: 20px; }
+            
+            .checkbox-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .chk-wrapper { font-size: 13px; }
+            
+            /* 사이즈 휠과 버튼이 세로로 예쁘게 쌓이도록 변경 */
+            .size-action-row { flex-direction: column; gap: 15px; }
+            .picker-container { width: 100%; min-width: unset; height: 120px; }
+            .picker-highlight { height: 36px; top: 50%; }
+            .wheel-spacer { height: 42px; }
+            .wheel-item { height: 36px; line-height: 36px; font-size: 16px; }
+            .wheel-item.selected { font-size: 19px; }
+            
+            /* 버튼을 길쭉한 막대 모양으로 변경 */
+            .btn-primary { width: 100%; height: 60px; flex-direction: row; gap: 10px; border-radius: 16px; box-shadow: 0 4px 0 #020617, 0 10px 15px rgba(0,0,0,0.2); }
+            .btn-primary:active { transform: translateY(4px); box-shadow: 0 0 0 #020617, 0 4px 8px rgba(0,0,0,0.2); height: 60px; }
+            .btn-icon { margin-bottom: 0; font-size: 20px; }
+            
+            table { min-width: 550px; margin-top: 10px; }
+            th, td { padding: 15px 10px; }
+        }
     </style>
 </head>
 <body>
-    <div class='card'>
+    <div class="card">
         <h2>👟 ShoeTracker Pro</h2>
         
-        <div class='input-group'>
-            <label class='section-title'>1. Select Target Stores</label>
-            <div class='checkbox-grid'>
-                <label class='chk-wrapper'><input type='checkbox' class='store-cb' value='https://paceathletic.com' data-name='Pace Athletic'> Pace Athletic</label>
-                <label class='chk-wrapper'><input type='checkbox' class='store-cb' value='https://www.therunningshop.com.au' data-name='The Running Shop'> The Running Shop</label>
-                <label class='chk-wrapper'><input type='checkbox' class='store-cb' value='https://www.keeponrunning.com.au' data-name='Keep On Running'> Keep On Running</label>
-                <label class='chk-wrapper'><input type='checkbox' class='store-cb' value='https://shop.therunningcompany.com.au' data-name='Running Company'> Running Company</label>
+        <div class="input-group">
+            <label class="section-title">1. Select Target Stores</label>
+            <div class="checkbox-grid">
+                <label class="chk-wrapper"><input type="checkbox" class="store-cb" value="https://paceathletic.com" data-name="Pace Athletic"> Pace Athletic</label>
+                <label class="chk-wrapper"><input type="checkbox" class="store-cb" value="https://www.therunningshop.com.au" data-name="The Running Shop"> The Running Shop</label>
+                <label class="chk-wrapper"><input type="checkbox" class="store-cb" value="https://www.keeponrunning.com.au" data-name="Keep On Running"> Keep On Running</label>
+                <label class="chk-wrapper"><input type="checkbox" class="store-cb" value="https://shop.therunningcompany.com.au" data-name="Running Company"> Running Company</label>
             </div>
-            <input type='text' id='custom-url' placeholder='(Optional) Add Shopify URLs, separated by commas (,)' autocomplete='off' spellcheck='false'>
+            <input type="text" id="custom-url" placeholder="(Optional) Add Shopify URLs, separated by commas (,)" autocomplete="off" spellcheck="false">
         </div>
 
-        <div class='input-group' id='kw-container'>
-            <label class='section-title'>2. Target Keywords (Leave blank for all)</label>
-            <input type='text' id='k' placeholder='e.g. Novablast' autocomplete='off' autocorrect='off' autocapitalize='off' spellcheck='false'>
-            <div id='history-dropdown'></div>
+        <div class="input-group" id="kw-container">
+            <label class="section-title">2. Target Keywords (Leave blank for all)</label>
+            <input type="text" id="k" placeholder="e.g. Novablast" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <div id="history-dropdown"></div>
         </div>
 
-        <div class='input-group'>
-            <label class='section-title'>3. Target Size & Scan</label>
-            <div class='size-action-row'>
-                <div class='picker-container' id='picker-main'>
-                    <div class='picker-highlight'></div>
-                    <div class='wheel-col' id='wheel-gender'>
-                        <div class='wheel-spacer'></div>
-                        <div class='wheel-item selected' data-val='USM'>USM (Men)</div>
-                        <div class='wheel-item' data-val='USW'>USW (Women)</div>
-                        <div class='wheel-spacer'></div>
+        <div class="input-group">
+            <label class="section-title">3. Target Size & Scan</label>
+            <div class="size-action-row">
+                <div class="picker-container" id="picker-main">
+                    <div class="picker-highlight"></div>
+                    <div class="wheel-col" id="wheel-gender">
+                        <div class="wheel-spacer"></div>
+                        <div class="wheel-item selected" data-val="USM">USM (Men)</div>
+                        <div class="wheel-item" data-val="USW">USW (Women)</div>
+                        <div class="wheel-spacer"></div>
                     </div>
-                    <div class='wheel-col' id='wheel-size'>
-                        <div class='wheel-spacer'></div>
-                        <div class='wheel-spacer' id='bottom-spacer'></div>
+                    <div class="wheel-col" id="wheel-size">
+                        <div class="wheel-spacer"></div>
+                        <div class="wheel-spacer" id="bottom-spacer"></div>
                     </div>
                 </div>
-                <button id='scanBtn' class='btn-primary'>
-                    <div class='btn-icon' id='btnIcon'>▶</div>
-                    <div id='btnText'>SCAN</div>
+                <button id="scanBtn" class="btn-primary">
+                    <div class="btn-icon" id="btnIcon">▶</div>
+                    <div id="btnText">SCAN</div>
                 </button>
             </div>
-            <div id='progress-container'><div id='progress-bar'></div></div>
-            <p id='status'>Ready to scan</p>
+            <div id="progress-container"><div id="progress-bar"></div></div>
+            <p id="status">Ready to scan</p>
         </div>
         
-        <table class='results-table'>
-            <thead>
-                <tr>
-                    <th>Store</th>
-                    <th>Shoe Model Title</th>
-                    <th id='phead'>Price</th>
-                    <th style='text-align:center;'>Link</th>
-                </tr>
-            </thead>
-            <tbody id='board'></tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Store</th>
+                        <th>Shoe Model Title</th>
+                        <th id="phead">Price</th>
+                        <th style="text-align:center;">Link</th>
+                    </tr>
+                </thead>
+                <tbody id="board"></tbody>
+            </table>
+        </div>
     </div>
     <script>
         const sizes = [6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0, 10.5, 11.0, 11.5, 12.0, 12.5, 13.0];
