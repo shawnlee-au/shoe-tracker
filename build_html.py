@@ -9,80 +9,48 @@ SAFE_HTML = """(L)!DOCTYPE html(R)
     (L)meta name="apple-mobile-web-app-status-bar-style" content="default"(R)
     (L)title(R)ShoeTracker Pro(L)/title(R)
     (L)style(R)
-        body { font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif; padding: 40px 20px; background: #f1f5f9; color: #0f172a; user-select: none; margin: 0; -webkit-tap-highlight-color: transparent; }
-        .card { background: #ffffff; padding: 40px; border-radius: 28px; max-width: 900px; margin: auto; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.8); }
-        h2 { text-align: center; font-size: 26px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; margin-bottom: 35px; margin-top: 0; }
-        .input-group { margin-bottom: 30px; position: relative; }
-        label.section-title { font-weight: 700; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 1.2px; display: block; margin-bottom: 12px; }
-        input[type='text'] { padding: 16px 20px; width: 100%; border: 1.5px solid #e2e8f0; border-radius: 14px; font-size: 16px; font-weight: 500; background: #f8fafc; color: #0f172a; box-sizing: border-box; outline: none; transition: all 0.25s; }
+        body { font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif; padding: 20px 15px; background: #f1f5f9; color: #0f172a; user-select: none; margin: 0; -webkit-tap-highlight-color: transparent; }
+        .card { background: #ffffff; padding: 25px 20px; border-radius: 24px; max-width: 900px; margin: auto; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.8); }
+        h2 { text-align: center; font-size: 24px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; margin-bottom: 25px; margin-top: 0; }
+        .input-group { margin-bottom: 25px; position: relative; }
+        label.section-title { font-weight: 700; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 1.2px; display: block; margin-bottom: 10px; }
+        input[type='text'] { padding: 14px 18px; width: 100%; border: 1.5px solid #e2e8f0; border-radius: 14px; font-size: 15px; font-weight: 500; background: #f8fafc; color: #0f172a; box-sizing: border-box; outline: none; transition: all 0.25s; }
         input[type='text']:focus { border-color: #3b82f6; background: #ffffff; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); }
         
-        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 15px; }
-        .chk-wrapper { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #334155; cursor: pointer; }
+        .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+        .chk-wrapper { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #334155; cursor: pointer; }
         .chk-wrapper input[type='checkbox'] { width: 18px; height: 18px; cursor: pointer; accent-color: #3b82f6; }
 
-        .size-action-row { display: flex; gap: 20px; align-items: center; }
-        .picker-container { flex: 1; display: flex; justify-content: center; align-items: center; height: 160px; background: #f8fafc; border-radius: 20px; border: 1.5px solid #e2e8f0; position: relative; -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%); mask-image: linear-gradient(to bottom, transparent, black 25%, black 75%, transparent); transition: opacity 0.3s; min-width: 200px; }
-        .picker-container.locked { pointer-events: none; opacity: 0.5; }
-        .picker-highlight { position: absolute; top: 50%; transform: translateY(-50%); left: 4%; right: 4%; height: 46px; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); z-index: 0; pointer-events: none; }
-        .wheel-col { width: 50%; height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; z-index: 1; }
+        /* 🔥 iOS 전용 휠 다이얼 버그 수정 (높이 138px 고정 & 클리핑 방지) 🔥 */
+        .size-action-row { display: flex; flex-direction: column; gap: 12px; }
+        .picker-container { width: 100%; height: 138px; background: #f8fafc; border-radius: 18px; border: 1.5px solid #e2e8f0; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+        .picker-mask { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 2; background: linear-gradient(to bottom, rgba(248, 250, 252, 0.95) 0%, rgba(248, 250, 252, 0) 30%, rgba(248, 250, 252, 0) 70%, rgba(248, 250, 252, 0.95) 100%); }
+        .picker-highlight { position: absolute; top: 50%; transform: translateY(-50%); left: 3%; right: 3%; height: 46px; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); z-index: 0; pointer-events: none; }
+        
+        .wheel-col { width: 50%; height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; z-index: 1; -webkit-overflow-scrolling: touch; }
         .wheel-col::-webkit-scrollbar { display: none; }
-        .wheel-spacer { height: 57px; }
-        .wheel-item { height: 46px; line-height: 46px; text-align: center; font-size: 17px; font-weight: 600; color: #94a3b8; scroll-snap-align: center; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); transform: scale(0.85); opacity: 0.4; }
-        .wheel-item.selected { color: #0f172a; font-size: 21px; font-weight: 800; transform: scale(1.05); opacity: 1; }
+        .wheel-spacer { height: 46px; }
+        .wheel-item { height: 46px; line-height: 46px; text-align: center; font-size: 16px; font-weight: 600; color: #94a3b8; scroll-snap-align: center; cursor: pointer; transition: all 0.2s; transform: scale(0.85); opacity: 0.35; }
+        .wheel-item.selected { color: #0f172a; font-size: 18px; font-weight: 800; transform: scale(1.05); opacity: 1; }
 
-        .btn-primary { flex: 0 0 140px; height: 160px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(to bottom, #1e293b, #0f172a); border: 1px solid #334155; border-radius: 20px; color: white; font-weight: 800; font-size: 15px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; box-shadow: 0 6px 0 #020617, 0 15px 20px rgba(0,0,0,0.2); transition: all 0.1s; }
-        .btn-primary:active { transform: translateY(6px); box-shadow: 0 0 0 #020617, 0 5px 10px rgba(0,0,0,0.2); height: 160px; }
-        .btn-stop { background: linear-gradient(to bottom, #ef4444, #dc2626) !important; border: 1px solid #b91c1c !important; box-shadow: 0 6px 0 #7f1d1d, 0 15px 20px rgba(239, 68, 68, 0.3) !important; }
-        .btn-stop:active { transform: translateY(6px); box-shadow: 0 0 0 #7f1d1d, 0 5px 10px rgba(239, 68, 68, 0.3) !important; }
-        .btn-icon { font-size: 26px; margin-bottom: 6px; }
+        .btn-primary { width: 100%; height: 54px; display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 8px; background: linear-gradient(to bottom, #1e293b, #0f172a); border: 1px solid #334155; border-radius: 16px; color: white; font-weight: 800; font-size: 15px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; box-shadow: 0 4px 0 #020617, 0 8px 15px rgba(0,0,0,0.15); transition: all 0.1s; }
+        .btn-primary:active { transform: translateY(4px); box-shadow: 0 0 0 #020617; height: 54px; }
+        .btn-stop { background: linear-gradient(to bottom, #ef4444, #dc2626) !important; border: 1px solid #b91c1c !important; box-shadow: 0 4px 0 #7f1d1d !important; }
+        .btn-icon { font-size: 18px; }
 
-        #progress-container { display: none; width: 100%; height: 4px; background: #e2e8f0; border-radius: 2px; margin-top: 20px; overflow: hidden; }
-        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #3b82f6, #a855f7, #ec4899); border-radius: 2px; box-shadow: 0 0 10px rgba(168, 85, 247, 0.5); transition: width 0.3s ease; }
-        #status { font-weight: 700; color: #64748b; margin-top: 12px; margin-bottom: 0; font-size: 14px; text-align: center; }
-
-        #history-dropdown { display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e2e8f0; border-radius: 14px; z-index: 100; max-height: 180px; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-top: 8px; padding: 8px 0; }
-        .history-item { padding: 12px 20px; cursor: pointer; font-size: 15px; font-weight: 500; color: #334155; transition: 0.15s; }
-        .history-item:hover { background: #f8fafc; color: #3b82f6; padding-left: 24px; font-weight: 600; }
+        #progress-container { display: none; width: 100%; height: 4px; background: #e2e8f0; border-radius: 2px; margin-top: 15px; overflow: hidden; }
+        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #3b82f6, #a855f7, #ec4899); border-radius: 2px; transition: width 0.3s ease; }
+        #status { font-weight: 700; color: #64748b; margin-top: 10px; margin-bottom: 0; font-size: 13px; text-align: center; }
 
         .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; border-collapse: separate; border-spacing: 0 12px; margin-top: 15px; }
-        th { font-size: 12px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; padding: 0 20px 8px 20px; border: none; }
-        td { background: #ffffff; padding: 20px; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
-        td:first-child { border-left: 1px solid #f1f5f9; border-top-left-radius: 16px; border-bottom-left-radius: 16px; box-shadow: -4px 4px 10px rgba(0,0,0,0.01); }
-        td:last-child { border-right: 1px solid #f1f5f9; border-top-right-radius: 16px; border-bottom-right-radius: 16px; box-shadow: 4px 4px 10px rgba(0,0,0,0.01); }
-        tbody tr { transition: all 0.25s ease; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
-        tbody tr:hover { transform: translateY(-3px) scale(1.005); box-shadow: 0 12px 20px -5px rgba(0,0,0,0.08); position: relative; z-index: 10; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0 10px; margin-top: 10px; min-width: 500px; }
+        th { font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; padding: 0 15px 6px 15px; border: none; }
+        td { background: #ffffff; padding: 15px; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        td:first-child { border-left: 1px solid #f1f5f9; border-top-left-radius: 14px; border-bottom-left-radius: 14px; }
+        td:last-child { border-right: 1px solid #f1f5f9; border-top-right-radius: 14px; border-bottom-right-radius: 14px; }
         
-        .badge { padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 800; color: white; letter-spacing: 0.5px; white-space: nowrap; }
-        .btn-link { padding: 8px 20px; background: #e0f2fe; color: #0284c7; text-decoration: none; border-radius: 100px; font-size: 13px; font-weight: 800; display: inline-block; transition: all 0.2s; white-space: nowrap; }
-        .btn-link:hover { background: #0284c7; color: white; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(2, 132, 199, 0.3); }
-
-        /* 🔥 MOBILE RESPONSIVE STYLES (아이폰용 뷰포트 설정) 🔥 */
-        @media (max-width: 600px) {
-            body { padding: 15px 10px 40px 10px; }
-            .card { padding: 25px 15px; border-radius: 20px; }
-            h2 { font-size: 22px; margin-bottom: 20px; }
-            
-            .checkbox-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-            .chk-wrapper { font-size: 13px; }
-            
-            /* 사이즈 휠과 버튼이 세로로 예쁘게 쌓이도록 변경 */
-            .size-action-row { flex-direction: column; gap: 15px; }
-            .picker-container { width: 100%; min-width: unset; height: 120px; }
-            .picker-highlight { height: 36px; top: 50%; }
-            .wheel-spacer { height: 42px; }
-            .wheel-item { height: 36px; line-height: 36px; font-size: 16px; }
-            .wheel-item.selected { font-size: 19px; }
-            
-            /* 버튼을 길쭉한 막대 모양으로 변경 */
-            .btn-primary { width: 100%; height: 60px; flex-direction: row; gap: 10px; border-radius: 16px; box-shadow: 0 4px 0 #020617, 0 10px 15px rgba(0,0,0,0.2); }
-            .btn-primary:active { transform: translateY(4px); box-shadow: 0 0 0 #020617, 0 4px 8px rgba(0,0,0,0.2); height: 60px; }
-            .btn-icon { margin-bottom: 0; font-size: 20px; }
-            
-            table { min-width: 550px; margin-top: 10px; }
-            th, td { padding: 15px 10px; }
-        }
+        .badge { padding: 5px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; color: white; white-space: nowrap; }
+        .btn-link { padding: 6px 16px; background: #e0f2fe; color: #0284c7; text-decoration: none; border-radius: 100px; font-size: 12px; font-weight: 800; display: inline-block; white-space: nowrap; }
     (L)/style(R)
 (L)/head(R)
 (L)body(R)
@@ -103,13 +71,13 @@ SAFE_HTML = """(L)!DOCTYPE html(R)
         (L)div class="input-group" id="kw-container"(R)
             (L)label class="section-title"(R)2. Target Keywords (Leave blank for all)(L)/label(R)
             (L)input type="text" id="k" placeholder="e.g. Novablast" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"(R)
-            (L)div id="history-dropdown"(R)(L)/div(R)
         (L)/div(R)
 
         (L)div class="input-group"(R)
             (L)label class="section-title"(R)3. Target Size & Scan(L)/label(R)
             (L)div class="size-action-row"(R)
                 (L)div class="picker-container" id="picker-main"(R)
+                    (L)div class="picker-mask"(R)(L)/div(R)
                     (L)div class="picker-highlight"(R)(L)/div(R)
                     (L)div class="wheel-col" id="wheel-gender"(R)
                         (L)div class="wheel-spacer"(R)(L)/div(R)
@@ -136,7 +104,7 @@ SAFE_HTML = """(L)!DOCTYPE html(R)
                 (L)thead(R)
                     (L)tr(R)
                         (L)th(R)Store(L)/th(R)
-                        (L)th(R)Shoe Model Title(L)/th(R)
+                        (L)th(R)Shoe Title(L)/th(R)
                         (L)th id="phead"(R)Price(L)/th(R)
                         (L)th style="text-align:center;"(R)Link(L)/th(R)
                     (L)/tr(R)
@@ -158,6 +126,7 @@ SAFE_HTML = """(L)!DOCTYPE html(R)
             div.innerText = sz.toFixed(1);
             sizeWheel.insertBefore(div, bSpacer);
         });
+
         function setupWheel(colId, onChange) {
             const col = document.getElementById(colId);
             col.addEventListener('scroll', () => {
@@ -173,36 +142,10 @@ SAFE_HTML = """(L)!DOCTYPE html(R)
                 });
                 items.forEach(i => i.classList.remove('selected'));
                 if (closest) { closest.classList.add('selected'); onChange(closest.dataset.val); }
-            });
+            }, { passive: true });
         }
         setupWheel('wheel-gender', val => { selGender = val; });
         setupWheel('wheel-size', val => { selSize = val; });
-
-        const kInput = document.getElementById('k');
-        const kwContainer = document.getElementById('kw-container');
-        const hDrop = document.getElementById('history-dropdown');
-        let historyList = JSON.parse(localStorage.getItem('shoeTrackerHistory') || '[]');
-        function renderHistory() {
-            hDrop.innerHTML = '';
-            if (historyList.length === 0) return;
-            historyList.forEach(kw => {
-                const div = document.createElement('div');
-                div.className = 'history-item';
-                div.innerText = kw;
-                div.onclick = () => { kInput.value = kw; hDrop.style.display = 'none'; };
-                hDrop.appendChild(div);
-            });
-        }
-        kInput.addEventListener('focus', () => { renderHistory(); if(historyList.length > 0) hDrop.style.display = 'block'; });
-        kwContainer.addEventListener('mouseenter', () => { renderHistory(); if(historyList.length > 0) hDrop.style.display = 'block'; });
-        kwContainer.addEventListener('mouseleave', () => { hDrop.style.display = 'none'; });
-        function saveHistory(kw) {
-            if(kw && !historyList.includes(kw)) {
-                historyList.unshift(kw);
-                if(historyList.length > 6) historyList.pop();
-                localStorage.setItem('shoeTrackerHistory', JSON.stringify(historyList));
-            }
-        }
 
         let abortCtrl = null;
         let isScanning = false;
@@ -217,7 +160,7 @@ SAFE_HTML = """(L)!DOCTYPE html(R)
             const pCont = document.getElementById('progress-container');
             const pBar = document.getElementById('progress-bar');
             const pickerMain = document.getElementById('picker-main');
-            const k_val = kInput.value.trim();
+            const k_val = document.getElementById('k').value.trim();
             
             if (isScanning) {
                 if (abortCtrl) abortCtrl.abort();
@@ -240,15 +183,14 @@ SAFE_HTML = """(L)!DOCTYPE html(R)
             }
             
             if(activeStores.length === 0) {
-                alert('Please select at least one store or enter a custom URL to scan!');
+                alert('Please select at least one store!');
                 return;
             }
 
-            if(k_val) saveHistory(k_val);
             const fullSize = selGender + ' ' + selSize;
             isScanning = true;
-            
-            pickerMain.classList.add('locked');
+            pickerMain.style.pointerEvents = 'none';
+            pickerMain.style.opacity = '0.5';
             
             icon.innerText = '⏹';
             text.innerText = 'STOP';
@@ -284,7 +226,7 @@ SAFE_HTML = """(L)!DOCTYPE html(R)
                 
                 let html = '';
                 if(data.length === 0) {
-                    html = '(L)tr(R)(L)td colspan="4" style="text-align:center; padding:30px; font-weight:600; color:#94a3b8;"(R)No matching shoes found.(L)/td(R)(L)/tr(R)';
+                    html = '(L)tr(R)(L)td colspan="4" style="text-align:center; padding:20px; font-weight:600; color:#94a3b8;"(R)No matching shoes found.(L)/td(R)(L)/tr(R)';
                 } else {
                     data.forEach(item => {
                         let bg = '#64748b';
@@ -295,8 +237,8 @@ SAFE_HTML = """(L)!DOCTYPE html(R)
                         
                         html += '(L)tr(R)';
                         html += '(L)td(R)(L)span class="badge" style="background:' + bg + '"(R)' + item.store + '(L)/span(R)(L)/td(R)';
-                        html += '(L)td(R)(L)b style="color:#0f172a; font-size:15px;"(R)' + item.title + '(L)/b(R)(L)/td(R)';
-                        html += '(L)td style="color:#10b981; font-weight:800; font-size:16px;"(R)' + item.price + '(L)/td(R)';
+                        html += '(L)td(R)(L)b style="color:#0f172a; font-size:14px;"(R)' + item.title + '(L)/b(R)(L)/td(R)';
+                        html += '(L)td style="color:#10b981; font-weight:800; font-size:15px;"(R)' + item.price + '(L)/td(R)';
                         html += '(L)td style="text-align:center;"(R)(L)a href="' + item.url + '" target="_blank" class="btn-link"(R)Store(L)/a(R)(L)/td(R)';
                         html += '(L)/tr(R)';
                     });
@@ -320,7 +262,8 @@ SAFE_HTML = """(L)!DOCTYPE html(R)
                 icon.innerText = '▶';
                 text.innerText = 'SCAN';
                 btn.classList.remove('btn-stop');
-                pickerMain.classList.remove('locked');
+                pickerMain.style.pointerEvents = 'auto';
+                pickerMain.style.opacity = '1';
             });
         };
     (L)/script(R)
@@ -330,4 +273,4 @@ SAFE_HTML = """(L)!DOCTYPE html(R)
 os.makedirs(os.path.expanduser("~/Desktop/ShoeCloud/templates"), exist_ok=True)
 with open(os.path.expanduser("~/Desktop/ShoeCloud/templates/index.html"), "w", encoding="utf-8") as f:
     f.write(SAFE_HTML.replace("(L)", "<").replace("(R)", ">"))
-print("✅ 모바일 반응형 index.html 파일 덮어쓰기 성공!")
+print("✅ 아이폰 휠 다이얼 버그 수정 완료!")
