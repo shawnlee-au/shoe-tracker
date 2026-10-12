@@ -1,5 +1,6 @@
 import os, json, urllib.request, re, ssl
 from flask import Flask, request, jsonify, render_template
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 try: _create_unverified_https_context = ssl._create_unverified_context
 except AttributeError: pass
@@ -16,17 +17,17 @@ def scan_store(name, url_base, kw, gender, size_num):
         search_url = f"{url_base}/search?q={search_term}"
         
         req = urllib.request.Request(search_url, headers={'User-Agent': 'Mozilla/5.0'})
-        html = urllib.request.urlopen(req, timeout=10).read().decode('utf-8')
+        html = urllib.request.urlopen(req, timeout=8).read().decode('utf-8')
         handles = list(dict.fromkeys(re.findall(r'href="[^"]*/products/([^"?/#]+)', html)))
         
         kl = kw.lower().strip()
         target_f = float(size_num)
         
-        for h in handles[:25]:
+        for h in handles[:20]:
             try:
                 p_url = f"{url_base}/products/{h}"
                 j_req = urllib.request.Request(f"{p_url}.js", headers={'User-Agent': 'Mozilla/5.0'})
-                j_data = json.loads(urllib.request.urlopen(j_req, timeout=5).read().decode('utf-8'))
+                j_data = json.loads(urllib.request.urlopen(j_req, timeout=4).read().decode('utf-8'))
                 t = j_data.get('title', h)
                 tl = t.lower()
                 
@@ -40,12 +41,10 @@ def scan_store(name, url_base, kw, gender, size_num):
                 if tl in seen_titles: continue
                 
                 for v in j_data.get('variants', []):
-                    v_title = v.get('title', '')
                     if not v.get('available'): continue
-                    
+                    v_title = v.get('title', '')
                     clean_title = re.sub(r'(UK|EU|EUR|CM|MM)\s*\d+(\.\d+)?', '', v_title, flags=re.IGNORECASE)
                     clean_title = re.sub(r'\d+(\.\d+)?\s*(UK|EU|EUR|CM|MM)', '', clean_title, flags=re.IGNORECASE)
-                    
                     v_nums_str = re.findall(r'\d+\.?\d*', clean_title)
                     if not v_nums_str: continue
                         
@@ -82,16 +81,31 @@ def home():
 def scan_api():
     try:
         req = request.get_json(silent=True) or {}
-        kw = req.get('k', '')
+        k_list = req.get('k_list', [])
         gender = req.get('g', 'USM')
         size_num = req.get('s', '9.5')
         stores = req.get('stores', [])
         
+        if not k_list: k_list = ['']
+
         data = []
-        for s in stores:
-            try: data.extend(scan_store(s['name'], s['url'], kw, gender, size_num))
-            except Exception: pass
-        return jsonify(data)
+        with ThreadPoolExecutor(max_workers=15) as executor:
+            futures = []
+            for s in stores:
+                for kw in k_list:
+                    futures.append(executor.submit(scan_store, s['name'], s['url'], kw, gender, size_num))
+            for future in as_completed(futures):
+                try: data.extend(future.result())
+                except: pass
+                
+        unique_data = []
+        seen = set()
+        for d in data:
+            if d['url'] not in seen:
+                seen.add(d['url'])
+                unique_data.append(d)
+                
+        return jsonify(unique_data)
     except Exception:
         return jsonify([])
 

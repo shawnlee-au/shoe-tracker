@@ -8,52 +8,57 @@
     <title>ShoeTracker Pro</title>
     <style>
         * { box-sizing: border-box; }
-        body { font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif; padding: 20px 12px 40px 12px; background: #f1f5f9; color: #0f172a; user-select: none; margin: 0; -webkit-tap-highlight-color: transparent; }
-        .card { background: #ffffff; padding: 22px 16px; border-radius: 24px; max-width: 900px; margin: auto; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.8); }
-        h2 { text-align: center; font-size: 22px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; margin-bottom: 20px; margin-top: 0; }
+        body { font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif; padding: 20px 12px 40px 12px; background: #f1f5f9; color: #0f172a; margin: 0; -webkit-tap-highlight-color: transparent; }
+        .card { background: #ffffff; padding: 22px 16px; border-radius: 24px; max-width: 900px; margin: auto; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.08); }
+        h2 { text-align: center; font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 20px; margin-top: 0; }
         .input-group { margin-bottom: 20px; position: relative; }
-        label.section-title { font-weight: 700; font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px; }
-        input[type='text'] { padding: 14px 16px; width: 100%; border: 1.5px solid #e2e8f0; border-radius: 14px; font-size: 15px; font-weight: 500; background: #f8fafc; color: #0f172a; outline: none; transition: all 0.25s; }
-        input[type='text']:focus { border-color: #3b82f6; background: #ffffff; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); }
+        label.section-title { font-weight: 800; font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 10px; }
         
         .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-        .chk-wrapper { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #334155; cursor: pointer; }
-        .chk-wrapper input[type='checkbox'] { width: 18px; height: 18px; cursor: pointer; accent-color: #3b82f6; }
+        .chk-wrapper { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #334155; cursor: pointer; }
+        .chk-wrapper input[type='checkbox'] { width: 16px; height: 16px; cursor: pointer; accent-color: #3b82f6; }
 
-        /* iOS 전용 휠 다이얼 컴팩트 스타일 */
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; background: #f8fafc; padding: 5px; border-radius: 16px; border: 1.5px solid #e2e8f0; }
+        .tab-btn { flex: 1; padding: 12px; text-align: center; font-size: 14px; font-weight: 800; color: #64748b; background: transparent; border: none; border-radius: 12px; cursor: pointer; transition: 0.2s; }
+        .tab-btn.active { background: #ffffff; color: #3b82f6; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        input[type='text'] { padding: 14px 16px; width: 100%; border: 1.5px solid #e2e8f0; border-radius: 14px; font-size: 15px; font-weight: 600; background: #ffffff; color: #0f172a; outline: none; transition: all 0.2s; }
+        input[type='text']:focus { border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); }
+
+        .pill-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .pill { background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 14px 10px; text-align: center; font-size: 13px; font-weight: 800; color: #64748b; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .pill.active { background: #eff6ff; border-color: #3b82f6; color: #1d4ed8; box-shadow: 0 4px 10px rgba(59,130,246,0.15); }
+
         .size-action-row { display: flex; flex-direction: column; gap: 12px; }
         .picker-container { width: 100%; height: 130px; background: #f8fafc; border-radius: 18px; border: 1.5px solid #e2e8f0; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; }
         .picker-mask { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 2; background: linear-gradient(to bottom, rgba(248, 250, 252, 0.95) 0%, rgba(248, 250, 252, 0) 30%, rgba(248, 250, 252, 0) 70%, rgba(248, 250, 252, 0.95) 100%); }
-        .picker-highlight { position: absolute; top: 50%; transform: translateY(-50%); left: 3%; right: 3%; height: 42px; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); z-index: 0; pointer-events: none; }
-        
+        .picker-highlight { position: absolute; top: 50%; transform: translateY(-50%); left: 3%; right: 3%; height: 42px; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); z-index: 0; }
         .wheel-col { width: 50%; height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; z-index: 1; -webkit-overflow-scrolling: touch; }
         .wheel-col::-webkit-scrollbar { display: none; }
         .wheel-spacer { height: 44px; }
-        .wheel-item { height: 42px; line-height: 42px; text-align: center; font-size: 15px; font-weight: 600; color: #94a3b8; scroll-snap-align: center; cursor: pointer; transition: all 0.2s; transform: scale(0.85); opacity: 0.35; }
+        .wheel-item { height: 42px; line-height: 42px; text-align: center; font-size: 15px; font-weight: 600; color: #94a3b8; scroll-snap-align: center; transition: all 0.2s; transform: scale(0.85); opacity: 0.35; }
         .wheel-item.selected { color: #0f172a; font-size: 17px; font-weight: 800; transform: scale(1.05); opacity: 1; }
 
-        .btn-primary { width: 100%; height: 50px; display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 8px; background: linear-gradient(to bottom, #1e293b, #0f172a); border: 1px solid #334155; border-radius: 16px; color: white; font-weight: 800; font-size: 15px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; box-shadow: 0 4px 0 #020617, 0 8px 15px rgba(0,0,0,0.15); transition: all 0.1s; }
-        .btn-primary:active { transform: translateY(4px); box-shadow: 0 0 0 #020617; height: 50px; }
-        .btn-stop { background: linear-gradient(to bottom, #ef4444, #dc2626) !important; border: 1px solid #b91c1c !important; box-shadow: 0 4px 0 #7f1d1d !important; }
-        .btn-icon { font-size: 16px; }
+        .btn-primary { width: 100%; height: 50px; display: flex; justify-content: center; align-items: center; gap: 8px; background: linear-gradient(to bottom, #1e293b, #0f172a); border: 1px solid #334155; border-radius: 16px; color: white; font-weight: 800; font-size: 15px; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 0 #020617, 0 8px 15px rgba(0,0,0,0.15); transition: 0.1s; }
+        .btn-primary:active { transform: translateY(4px); box-shadow: 0 0 0 #020617; }
+        .btn-stop { background: linear-gradient(to bottom, #ef4444, #dc2626) !important; border-color: #b91c1c !important; box-shadow: 0 4px 0 #7f1d1d !important; }
 
         #progress-container { display: none; width: 100%; height: 4px; background: #e2e8f0; border-radius: 2px; margin-top: 15px; overflow: hidden; }
-        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #3b82f6, #a855f7, #ec4899); border-radius: 2px; transition: width 0.3s ease; }
+        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #3b82f6, #a855f7, #ec4899); transition: width 0.3s; }
         #status { font-weight: 700; color: #64748b; margin-top: 10px; margin-bottom: 0; font-size: 13px; text-align: center; }
 
-        /* 🔥 모바일 한눈에 보기 카드 리스트 UI (측면 스크롤 제로) 🔥 */
         .results-container { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
-        .shoe-item-card { background: #ffffff; border: 1.5px solid #f1f5f9; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .shoe-item-card { background: #ffffff; border: 1.5px solid #f1f5f9; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
         .card-header { display: flex; justify-content: space-between; align-items: center; }
-        .badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; color: white; display: inline-block; }
-        .price-text { font-size: 16px; font-weight: 800; color: #10b981; }
-        
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; color: white; }
+        .price-text { font-size: 16px; font-weight: 900; color: #10b981; }
         .card-body { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
         .shoe-title { font-size: 14px; font-weight: 700; color: #0f172a; line-height: 1.35; flex: 1; word-break: keep-all; }
-        .btn-link { padding: 8px 18px; background: #3b82f6; color: #ffffff; text-decoration: none; border-radius: 100px; font-size: 12px; font-weight: 800; display: inline-block; white-space: nowrap; box-shadow: 0 3px 8px rgba(59, 130, 246, 0.3); }
-        .btn-link:active { transform: scale(0.96); }
-
-        .no-result { text-align: center; padding: 30px; font-weight: 600; color: #94a3b8; background: #ffffff; border-radius: 16px; border: 1.5px solid #f1f5f9; }
+        .btn-link { padding: 10px 16px; background: #3b82f6; color: #ffffff; text-decoration: none; border-radius: 12px; font-size: 12px; font-weight: 800; display: inline-block; white-space: nowrap; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); }
+        .no-result { text-align: center; padding: 30px; font-weight: 700; color: #94a3b8; background: #ffffff; border-radius: 16px; border: 1.5px solid #f1f5f9; }
     </style>
 </head>
 <body>
@@ -63,17 +68,39 @@
         <div class="input-group">
             <label class="section-title">1. Select Target Stores</label>
             <div class="checkbox-grid">
-                <label class="chk-wrapper"><input type="checkbox" class="store-cb" value="https://paceathletic.com" data-name="Pace Athletic"> Pace Athletic</label>
-                <label class="chk-wrapper"><input type="checkbox" class="store-cb" value="https://www.therunningshop.com.au" data-name="The Running Shop"> The Running Shop</label>
-                <label class="chk-wrapper"><input type="checkbox" class="store-cb" value="https://www.keeponrunning.com.au" data-name="Keep On Running"> Keep On Running</label>
-                <label class="chk-wrapper"><input type="checkbox" class="store-cb" value="https://shop.therunningcompany.com.au" data-name="Running Company"> Running Company</label>
+                <label class="chk-wrapper"><input type="checkbox" class="store-cb" value="https://paceathletic.com" data-name="Pace Athletic" checked> Pace Athletic</label>
+                <label class="chk-wrapper"><input type="checkbox" class="store-cb" value="https://www.therunningshop.com.au" data-name="The Running Shop" checked> The Running Shop</label>
+                <label class="chk-wrapper"><input type="checkbox" class="store-cb" value="https://www.keeponrunning.com.au" data-name="Keep On Running" checked> Keep On Running</label>
+                <label class="chk-wrapper"><input type="checkbox" class="store-cb" value="https://shop.therunningcompany.com.au" data-name="Running Company" checked> Running Company</label>
+                <label class="chk-wrapper"><input type="checkbox" class="store-cb" value="https://rhavoc.com" data-name="Running Havoc" checked> Running Havoc</label>
+                <label class="chk-wrapper"><input type="checkbox" class="store-cb" value="https://solemotive.com" data-name="Sole Motive" checked> Sole Motive</label>
+                <label class="chk-wrapper" style="grid-column: 1 / -1;"><input type="checkbox" class="store-cb" value="https://runnersshop.com.au" data-name="Runners Shop" checked> Runners Shop</label>
             </div>
-            <input type="text" id="custom-url" placeholder="(Optional) Add Shopify URLs, separated by commas (,)" autocomplete="off" spellcheck="false">
         </div>
 
-        <div class="input-group" id="kw-container">
-            <label class="section-title">2. Target Keywords (Leave blank for all)</label>
+        <div class="tabs">
+            <button class="tab-btn active" id="tabBtn-direct" onclick="switchTab('direct')">🔍 직접 검색</button>
+            <button class="tab-btn" id="tabBtn-smart" onclick="switchTab('smart')">💡 스마트 추천</button>
+        </div>
+
+        <div class="input-group tab-content active" id="content-direct">
+            <label class="section-title">2. Target Keyword (Leave blank for all)</label>
             <input type="text" id="k" placeholder="e.g. Novablast" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        </div>
+
+        <div class="input-group tab-content" id="content-smart">
+            <label class="section-title">2-1. 러닝 목적 선택</label>
+            <div class="pill-grid purpose-grid">
+                <div class="pill active" data-val="daily" onclick="selectPill(this, 'purpose')">데일리 트레이닝</div>
+                <div class="pill" data-val="max" onclick="selectPill(this, 'purpose')">맥스 쿠셔닝</div>
+                <div class="pill" data-val="racing" onclick="selectPill(this, 'purpose')">로드 레이싱(카본화)</div>
+                <div class="pill" data-val="super" onclick="selectPill(this, 'purpose')">수퍼 트레이닝</div>
+            </div>
+            <label class="section-title">2-2. 신발 버전 선택</label>
+            <div class="pill-grid version-grid" style="margin-bottom:0;">
+                <div class="pill active" data-val="latest" onclick="selectPill(this, 'version')">🆕 최신형 신상</div>
+                <div class="pill" data-val="value" onclick="selectPill(this, 'version')">💰 직전 가성비 모델</div>
+            </div>
         </div>
 
         <div class="input-group">
@@ -104,7 +131,26 @@
         
         <div class="results-container" id="board"></div>
     </div>
+    
     <script>
+        let currentMode = 'direct';
+        function switchTab(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById('tabBtn-' + mode).classList.add('active');
+            document.getElementById('content-' + mode).classList.add('active');
+        }
+
+        let selPurpose = 'daily';
+        let selVersion = 'latest';
+        function selectPill(el, type) {
+            el.parentElement.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+            el.classList.add('active');
+            if (type === 'purpose') selPurpose = el.dataset.val;
+            if (type === 'version') selVersion = el.dataset.val;
+        }
+
         const sizes = [6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0, 10.5, 11.0, 11.5, 12.0, 12.5, 13.0];
         let selGender = 'USM';
         let selSize = '9.5';
@@ -122,13 +168,11 @@
             const col = document.getElementById(colId);
             col.addEventListener('scroll', () => {
                 const items = col.querySelectorAll('.wheel-item');
-                let closest = null;
-                let minDiff = Infinity;
+                let closest = null, minDiff = Infinity;
                 const colCenter = col.getBoundingClientRect().top + col.clientHeight / 2;
                 items.forEach(item => {
                     const rect = item.getBoundingClientRect();
-                    const itemCenter = rect.top + rect.height / 2;
-                    const diff = Math.abs(colCenter - itemCenter);
+                    const diff = Math.abs(colCenter - (rect.top + rect.height / 2));
                     if (diff < minDiff) { minDiff = diff; closest = item; }
                 });
                 items.forEach(i => i.classList.remove('selected'));
@@ -138,92 +182,88 @@
         setupWheel('wheel-gender', val => { selGender = val; });
         setupWheel('wheel-size', val => { selSize = val; });
 
-        let abortCtrl = null;
-        let isScanning = false;
-        let progInt = null;
+        const shoeDB = {
+            daily: {
+                latest: ['Novablast 4', 'Pegasus 41', 'Clifton 9', '880 v14', 'Ghost 16'],
+                value: ['Novablast 3', 'Pegasus 40', 'Clifton 8', '880 v13', 'Ghost 15']
+            },
+            max: {
+                latest: ['Nimbus 26', '1080 v13', 'Bondi 8', 'Invincible 3', 'Ghost Max'],
+                value: ['Nimbus 25', '1080 v12', 'Bondi 7', 'Invincible 2']
+            },
+            racing: {
+                latest: ['Vaporfly 3', 'Alphafly 3', 'Metaspeed Sky Paris', 'Endorphin Pro 4'],
+                value: ['Vaporfly 2', 'Alphafly 2', 'Metaspeed Sky+', 'Endorphin Pro 3']
+            },
+            super: {
+                latest: ['Superblast 2', 'Mach X 2', 'SC Trainer v3', 'Endorphin Speed 4'],
+                value: ['Superblast', 'Mach X', 'SC Trainer v2', 'Endorphin Speed 3']
+            }
+        };
+
+        let abortCtrl = null, isScanning = false, progInt = null;
         
         document.getElementById('scanBtn').onclick = function() {
-            const btn = this;
-            const icon = document.getElementById('btnIcon');
-            const text = document.getElementById('btnText');
-            const stat = document.getElementById('status');
-            const brd = document.getElementById('board');
-            const pCont = document.getElementById('progress-container');
-            const pBar = document.getElementById('progress-bar');
-            const pickerMain = document.getElementById('picker-main');
-            const k_val = document.getElementById('k').value.trim();
-            
-            if (isScanning) {
-                if (abortCtrl) abortCtrl.abort();
-                return;
-            }
+            if (isScanning) { if (abortCtrl) abortCtrl.abort(); return; }
             
             let activeStores = [];
-            document.querySelectorAll('.store-cb:checked').forEach(cb => {
-                activeStores.push({name: cb.dataset.name, url: cb.value});
-            });
-            
-            const customUrlRaw = document.getElementById('custom-url').value.trim();
-            if (customUrlRaw) {
-                const urls = customUrlRaw.split(',').map(u => u.trim()).filter(u => u);
-                urls.forEach(u => {
-                    let cName = 'Custom Store';
-                    try { cName = new URL(u).hostname.replace('www.', ''); } catch(e){}
-                    activeStores.push({name: cName, url: u});
-                });
-            }
-            
-            if(activeStores.length === 0) {
-                alert('Please select at least one store!');
-                return;
+            document.querySelectorAll('.store-cb:checked').forEach(cb => { activeStores.push({name: cb.dataset.name, url: cb.value}); });
+            if(activeStores.length === 0) { alert('최소 1개 이상의 스토어를 선택해주세요!'); return; }
+
+            let k_list = [];
+            let searchLabel = "";
+            if (currentMode === 'direct') {
+                let val = document.getElementById('k').value.trim();
+                if (val) k_list = [val];
+                searchLabel = val ? "'" + val + "'" : "ALL SHOES";
+            } else {
+                k_list = shoeDB[selPurpose][selVersion];
+                let pText = document.querySelector(`.purpose-grid .pill[data-val="${selPurpose}"]`).innerText;
+                let vText = document.querySelector(`.version-grid .pill[data-val="${selVersion}"]`).innerText;
+                searchLabel = `[${pText} / ${vText}]`;
             }
 
-            const fullSize = selGender + ' ' + selSize;
             isScanning = true;
-            pickerMain.style.pointerEvents = 'none';
-            pickerMain.style.opacity = '0.5';
+            document.getElementById('picker-main').style.pointerEvents = 'none';
+            document.getElementById('picker-main').style.opacity = '0.5';
             
-            icon.innerText = '⏹';
-            text.innerText = 'STOP';
+            const btn = this, stat = document.getElementById('status'), brd = document.getElementById('board'), pCont = document.getElementById('progress-container'), pBar = document.getElementById('progress-bar');
+            document.getElementById('btnIcon').innerText = '⏹';
+            document.getElementById('btnText').innerText = 'STOP';
             btn.classList.add('btn-stop');
             
-            let searchStr = k_val ? "'" + k_val + "'" : "ALL SHOES";
-            stat.innerText = "🟢 Scanning " + searchStr + " (" + activeStores.length + " Stores)...";
+            stat.innerText = "🟢 Scanning " + searchLabel + " (" + activeStores.length + " Stores)...";
             stat.style.color = '#3b82f6';
-            
             brd.innerHTML = '';
+            pCont.style.display = 'block'; pBar.style.width = '0%';
             
-            pCont.style.display = 'block';
-            pBar.style.width = '0%';
-            let progW = 0;
-            clearInterval(progInt);
-            progInt = setInterval(() => {
-                if (progW < 90) { progW += (90 - progW) / 10; pBar.style.width = progW + '%'; }
-            }, 500);
+            let progW = 0; clearInterval(progInt);
+            progInt = setInterval(() => { if (progW < 90) { progW += (90 - progW) / 10; pBar.style.width = progW + '%'; } }, 500);
 
+            const fullSize = selGender + ' ' + selSize;
             abortCtrl = new AbortController();
             fetch('/api/scan', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({k: k_val, g: selGender, s: selSize, stores: activeStores}),
+                body: JSON.stringify({k_list: k_list, g: selGender, s: selSize, stores: activeStores}),
                 signal: abortCtrl.signal
             })
             .then(res => res.json())
             .then(data => {
-                clearInterval(progInt);
-                pBar.style.width = '100%';
+                clearInterval(progInt); pBar.style.width = '100%';
                 setTimeout(() => { pCont.style.display = 'none'; }, 800);
                 
                 let html = '';
                 if(data.length === 0) {
-                    html = '<div class="no-result">No matching shoes found.</div>';
+                    html = '<div class="no-result">선택하신 조건의 러닝화 재고를 찾지 못했습니다.</div>';
                 } else {
                     data.forEach(item => {
                         let bg = '#64748b';
-                        if(item.store.includes('Running Shop')) bg = '#ef4444';
+                        if(item.store.includes('Running Shop') || item.store.includes('Runners Shop')) bg = '#ef4444';
                         else if(item.store.includes('Keep On')) bg = '#f59e0b';
                         else if(item.store.includes('Running Company')) bg = '#6366f1';
                         else if(item.store.includes('Pace')) bg = '#0f172a';
+                        else if(item.store.includes('Havoc') || item.store.includes('Sole')) bg = '#10b981';
                         
                         html += '<div class="shoe-item-card">';
                         html += '  <div class="card-header">';
@@ -238,26 +278,21 @@
                     });
                 }
                 brd.innerHTML = html;
-                stat.innerText = '✅ Scan Complete!';
+                stat.innerText = '✅ ' + data.length + '개의 상품 스캔 완료!';
                 stat.style.color = '#10b981';
             })
             .catch((err) => {
-                clearInterval(progInt);
-                pCont.style.display = 'none';
-                if (err.name === 'AbortError') {
-                    stat.innerText = '🛑 Scan Stopped by User';
-                } else {
-                    stat.innerText = '🔴 Error occurred!';
-                }
+                clearInterval(progInt); pCont.style.display = 'none';
+                stat.innerText = (err.name === 'AbortError') ? '🛑 스캔 취소됨' : '🔴 오류가 발생했습니다.';
                 stat.style.color = '#ef4444';
             })
             .finally(() => {
                 isScanning = false;
-                icon.innerText = '▶';
-                text.innerText = 'SCAN';
+                document.getElementById('btnIcon').innerText = '▶';
+                document.getElementById('btnText').innerText = 'SCAN';
                 btn.classList.remove('btn-stop');
-                pickerMain.style.pointerEvents = 'auto';
-                pickerMain.style.opacity = '1';
+                document.getElementById('picker-main').style.pointerEvents = 'auto';
+                document.getElementById('picker-main').style.opacity = '1';
             });
         };
     </script>
