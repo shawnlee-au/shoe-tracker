@@ -6,94 +6,96 @@
     <title>ShoeTracker Pro</title>
     <style>
         * { box-sizing: border-box; }
-        body { font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif; padding: 20px 12px 40px 12px; background: #f1f5f9; color: #0f172a; margin: 0; -webkit-tap-highlight-color: transparent; }
-        .card { background: #ffffff; padding: 22px 16px; border-radius: 24px; max-width: 900px; margin: auto; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.08); }
-        h2 { text-align: center; font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 20px; margin-top: 0; display:flex; justify-content:center; align-items:center; gap:8px; }
-        .input-group { margin-bottom: 20px; position: relative; }
-        label.section-title { font-weight: 800; font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 10px; }
+        body { font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif; padding: 12px 8px 30px 8px; background: #f1f5f9; color: #0f172a; margin: 0; -webkit-tap-highlight-color: transparent; }
+        .card { background: #ffffff; padding: 16px 12px; border-radius: 20px; max-width: 900px; margin: auto; box-shadow: 0 15px 30px -10px rgba(0,0,0,0.08); }
+        h2 { text-align: center; font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 15px; margin-top: 0; display:flex; justify-content:center; align-items:center; gap:6px; }
+        .input-group { margin-bottom: 15px; position: relative; }
+        label.section-title { font-weight: 800; font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; }
         
-        .tabs { display: flex; gap: 8px; margin-bottom: 20px; background: #f8fafc; padding: 5px; border-radius: 16px; border: 1.5px solid #e2e8f0; }
-        .tab-btn { flex: 1; padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 800; color: #64748b; background: transparent; border: none; border-radius: 12px; cursor: pointer; transition: 0.2s; white-space: nowrap; }
-        .tab-btn.active { background: #ffffff; color: #3b82f6; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .tabs { display: flex; gap: 6px; margin-bottom: 15px; background: #f8fafc; padding: 4px; border-radius: 14px; border: 1.5px solid #e2e8f0; }
+        .tab-btn { flex: 1; padding: 8px 4px; text-align: center; font-size: 12px; font-weight: 800; color: #64748b; background: transparent; border: none; border-radius: 10px; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+        .tab-btn.active { background: #ffffff; color: #3b82f6; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
 
-        input[type='text'] { padding: 14px 16px; width: 100%; border: 1.5px solid #e2e8f0; border-radius: 14px; font-size: 14px; font-weight: 600; background: #ffffff; color: #0f172a; outline: none; transition: all 0.2s; }
-        input[type='text']:focus { border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); }
+        input[type='text'] { padding: 12px 14px; width: 100%; border: 1.5px solid #e2e8f0; border-radius: 12px; font-size: 13px; font-weight: 600; background: #ffffff; color: #0f172a; outline: none; transition: all 0.2s; }
+        input[type='text']:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
 
-        .pill-grid { display: grid; gap: 8px; margin-bottom: 15px; }
-        .pill { background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 14px 6px; text-align: center; font-size: 13px; font-weight: 800; color: #64748b; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .pill.active { background: #eff6ff; border-color: #3b82f6; color: #1d4ed8; box-shadow: 0 4px 10px rgba(59,130,246,0.15); }
+        .pill { background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 10px 8px; text-align: center; font-size: 11px; font-weight: 800; color: #64748b; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .pill.active { background: #eff6ff; border-color: #3b82f6; color: #1d4ed8; box-shadow: 0 4px 8px rgba(59,130,246,0.15); }
 
-        /* 스토어 버튼: 균일 사이즈 & 말풍선 */
-        .store-grid { grid-template-columns: repeat(3, 1fr); margin-bottom: 20px; }
-        @media (max-width: 400px) { .store-grid { grid-template-columns: repeat(2, 1fr); } }
-        .store-grid .pill { font-size: 12px; padding: 12px 5px; position: relative; }
-        .store-grid .pill:hover::after {
+        /* 🔥 스토어 1줄 가로 스크롤 & 툴팁 🔥 */
+        .store-row { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 6px; padding-bottom: 4px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .store-row::-webkit-scrollbar { display: none; }
+        .store-pill { flex: 0 0 auto; padding: 8px 14px; font-size: 11px; border-radius: 16px; position: relative; }
+        .store-pill:hover::after {
             content: attr(data-tooltip);
-            position: absolute; bottom: 115%; left: 50%; transform: translateX(-50%);
-            background: #1e293b; color: #ffffff; padding: 6px 10px; border-radius: 8px;
-            font-size: 11px; white-space: nowrap; z-index: 100; font-weight: 600;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2); pointer-events: none;
+            position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%);
+            background: #1e293b; color: #ffffff; padding: 4px 8px; border-radius: 6px;
+            font-size: 10px; white-space: nowrap; z-index: 100; font-weight: 700;
+            pointer-events: none; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
 
-        .purpose-grid { grid-template-columns: 1fr 1fr; margin-bottom: 0; }
-        .brand-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
-        .brand-grid .pill { padding: 10px 4px; font-size: 11px; }
+        .brand-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap: 6px; margin-bottom: 10px; }
+        .brand-grid .pill { padding: 8px 4px; font-size: 10px; }
 
-        .size-action-row { display: flex; flex-direction: column; gap: 12px; }
-        .picker-container { width: 100%; height: 130px; background: #f8fafc; border-radius: 18px; border: 1.5px solid #e2e8f0; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+        /* 🔥 목적 & 사이즈 병합 휠 다이얼 🔥 */
+        .size-action-row { display: flex; flex-direction: column; gap: 10px; }
+        .picker-container { width: 100%; height: 110px; background: #f8fafc; border-radius: 16px; border: 1.5px solid #e2e8f0; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; }
         .picker-mask { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 2; background: linear-gradient(to bottom, rgba(248, 250, 252, 0.95) 0%, rgba(248, 250, 252, 0) 30%, rgba(248, 250, 252, 0) 70%, rgba(248, 250, 252, 0.95) 100%); }
-        .picker-highlight { position: absolute; top: 50%; transform: translateY(-50%); left: 3%; right: 3%; height: 42px; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); z-index: 0; }
-        .wheel-col { width: 50%; height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; z-index: 1; -webkit-overflow-scrolling: touch; }
+        .picker-highlight { position: absolute; top: 50%; transform: translateY(-50%); left: 2%; right: 2%; height: 36px; background: #ffffff; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.06); z-index: 0; }
+        
+        .wheel-col { height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; z-index: 1; -webkit-overflow-scrolling: touch; }
         .wheel-col::-webkit-scrollbar { display: none; }
-        .wheel-spacer { height: 44px; }
-        .wheel-item { height: 42px; line-height: 42px; text-align: center; font-size: 15px; font-weight: 600; color: #94a3b8; scroll-snap-align: center; transition: all 0.2s; transform: scale(0.85); opacity: 0.35; }
-        .wheel-item.selected { color: #0f172a; font-size: 17px; font-weight: 800; transform: scale(1.05); opacity: 1; }
+        #wheel-purpose { width: 40%; display: none; } /* Recommend 탭에서만 보임 */
+        #wheel-gender { width: 50%; }
+        #wheel-size { width: 50%; }
+        
+        .wheel-spacer { height: 37px; }
+        .wheel-item { height: 36px; line-height: 36px; text-align: center; font-size: 13px; font-weight: 600; color: #94a3b8; scroll-snap-align: center; transition: all 0.2s; transform: scale(0.85); opacity: 0.35; white-space: nowrap; }
+        .wheel-item.selected { color: #0f172a; font-size: 14px; font-weight: 800; transform: scale(1.05); opacity: 1; }
 
-        .btn-primary { width: 100%; height: 50px; display: flex; justify-content: center; align-items: center; gap: 8px; background: linear-gradient(to bottom, #1e293b, #0f172a); border: 1px solid #334155; border-radius: 16px; color: white; font-weight: 800; font-size: 15px; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 0 #020617, 0 8px 15px rgba(0,0,0,0.15); transition: 0.1s; }
+        .btn-primary { width: 100%; height: 44px; display: flex; justify-content: center; align-items: center; gap: 6px; background: linear-gradient(to bottom, #1e293b, #0f172a); border: 1px solid #334155; border-radius: 14px; color: white; font-weight: 800; font-size: 13px; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 0 #020617, 0 6px 12px rgba(0,0,0,0.15); transition: 0.1s; }
         .btn-primary:active { transform: translateY(4px); box-shadow: 0 0 0 #020617; }
         .btn-stop { background: linear-gradient(to bottom, #ef4444, #dc2626) !important; border-color: #b91c1c !important; box-shadow: 0 4px 0 #7f1d1d !important; }
 
-        #progress-container { display: none; width: 100%; height: 4px; background: #e2e8f0; border-radius: 2px; margin-top: 15px; overflow: hidden; }
+        #progress-container { display: none; width: 100%; height: 4px; background: #e2e8f0; border-radius: 2px; margin-top: 12px; overflow: hidden; }
         #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #3b82f6, #a855f7, #ec4899); transition: width 0.3s; }
-        #status { font-weight: 700; color: #64748b; margin-top: 10px; margin-bottom: 0; font-size: 13px; text-align: center; }
+        #status { font-weight: 700; color: #64748b; margin-top: 8px; margin-bottom: 0; font-size: 11px; text-align: center; }
 
         /* Filter & Results Area */
-        #filter-section { display: none; margin-top: 25px; background: #f8fafc; padding: 15px; border-radius: 16px; border: 1.5px dashed #cbd5e1; }
-        .results-container { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
-        .shoe-item-card { background: #ffffff; border: 1.5px solid #f1f5f9; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); position: relative; overflow: hidden; }
-        .pref-badge { position: absolute; top: 0; right: 0; background: #f59e0b; color: white; font-size: 9px; font-weight: 900; padding: 4px 10px; border-bottom-left-radius: 10px; box-shadow: -2px 2px 5px rgba(0,0,0,0.1); }
+        #filter-section { display: none; margin-top: 20px; background: #f8fafc; padding: 12px; border-radius: 14px; border: 1.5px dashed #cbd5e1; }
+        .results-container { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+        .shoe-item-card { background: #ffffff; border: 1.5px solid #f1f5f9; border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); position: relative; overflow: hidden; }
+        .pref-badge { position: absolute; top: 0; right: 0; background: #f59e0b; color: white; font-size: 8px; font-weight: 900; padding: 3px 8px; border-bottom-left-radius: 8px; box-shadow: -2px 2px 5px rgba(0,0,0,0.1); }
         .card-header { display: flex; justify-content: space-between; align-items: center; }
-        .badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; color: white; }
-        .price-text { font-size: 16px; font-weight: 900; color: #10b981; }
-        .card-body { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-        .shoe-title { font-size: 14px; font-weight: 700; color: #0f172a; line-height: 1.35; flex: 1; word-break: keep-all; }
-        .btn-link { padding: 10px 16px; background: #3b82f6; color: #ffffff; text-decoration: none; border-radius: 12px; font-size: 12px; font-weight: 800; display: inline-block; white-space: nowrap; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); }
-        .no-result { text-align: center; padding: 30px; font-weight: 700; color: #94a3b8; background: #ffffff; border-radius: 16px; border: 1.5px solid #f1f5f9; }
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 9px; font-weight: 800; color: white; }
+        .price-text { font-size: 15px; font-weight: 900; color: #10b981; }
+        .card-body { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+        .shoe-title { font-size: 13px; font-weight: 700; color: #0f172a; line-height: 1.3; flex: 1; word-break: keep-all; }
+        .btn-link { padding: 8px 14px; background: #3b82f6; color: #ffffff; text-decoration: none; border-radius: 10px; font-size: 11px; font-weight: 800; display: inline-block; white-space: nowrap; box-shadow: 0 3px 8px rgba(59, 130, 246, 0.3); }
+        .no-result { text-align: center; padding: 25px; font-weight: 700; color: #94a3b8; font-size: 12px; background: #ffffff; border-radius: 14px; border: 1.5px solid #f1f5f9; }
 
-        /* Admin Modal UI */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 1000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(4px); }
-        .modal-content { background: #ffffff; width: 100%; max-width: 500px; border-radius: 24px; padding: 24px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto; }
-        .admin-input { margin-bottom: 15px; padding: 12px 14px; font-size: 13px; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; width: 100%; }
-        .close-modal { float: right; font-size: 20px; font-weight: bold; color: #94a3b8; cursor: pointer; border: none; background: none; }
+        /* Admin Modal */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 1000; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(4px); }
+        .modal-content { background: #ffffff; width: 100%; max-width: 400px; border-radius: 20px; padding: 20px; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto; }
+        .admin-input { margin-bottom: 12px; padding: 10px 12px; font-size: 12px; border-radius: 10px; }
+        .close-modal { float: right; font-size: 18px; font-weight: bold; color: #94a3b8; cursor: pointer; border: none; background: none; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2>👟 ShoeTracker Pro <span id="admin-trigger" style="font-size:16px; color:#cbd5e1; cursor:pointer;">⚙️</span></h2>
+        <h2>👟 ShoeTracker Pro <span id="admin-trigger" style="font-size:14px; color:#cbd5e1; cursor:pointer;">⚙️</span></h2>
         
+        <!-- 초소형 1줄 스토어 선택 -->
         <div class="input-group">
             <label class="section-title">1. Target Stores</label>
-            <div class="pill-grid store-grid">
+            <div class="store-row">
                 <div class="pill active store-pill" data-val="https://paceathletic.com" data-name="Pace Athletic" data-tooltip="Pace Athletic" onclick="toggleBtn(this)">Pace</div>
                 <div class="pill active store-pill" data-val="https://www.therunningshop.com.au" data-name="The Running Shop" data-tooltip="The Running Shop" onclick="toggleBtn(this)">Running Shop</div>
                 <div class="pill active store-pill" data-val="https://www.keeponrunning.com.au" data-name="Keep On Running" data-tooltip="Keep On Running" onclick="toggleBtn(this)">Keep On</div>
                 <div class="pill active store-pill" data-val="https://shop.therunningcompany.com.au" data-name="Running Company" data-tooltip="Running Company" onclick="toggleBtn(this)">Company</div>
                 <div class="pill active store-pill" data-val="https://rhavoc.com" data-name="Running Havoc" data-tooltip="Running Havoc" onclick="toggleBtn(this)">Havoc</div>
                 <div class="pill active store-pill" data-val="https://solemotive.com" data-name="Sole Motive" data-tooltip="Sole Motive" onclick="toggleBtn(this)">Sole Motive</div>
-                <div class="pill active store-pill" data-val="https://runnersshop.com.au" data-name="Runners Shop" data-tooltip="Runners Shop" onclick="toggleBtn(this)" style="grid-column: 1 / -1;">Runners Shop</div>
+                <div class="pill active store-pill" data-val="https://runnersshop.com.au" data-name="Runners Shop" data-tooltip="Runners Shop" onclick="toggleBtn(this)">Runners Shop</div>
             </div>
         </div>
 
@@ -102,27 +104,28 @@
             <button class="tab-btn" id="tabBtn-smart" onclick="switchTab('smart')">💡 Recommend</button>
         </div>
 
+        <!-- 직접 검색 모드 키워드 -->
         <div class="input-group tab-content active" id="content-direct">
             <label class="section-title">2. Target Keyword (Leave blank for all)</label>
             <input type="text" id="k" placeholder="e.g. Novablast" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         </div>
 
-        <div class="input-group tab-content" id="content-smart">
-            <label class="section-title">2. Running Purpose</label>
-            <div class="pill-grid purpose-grid" style="margin-bottom:0;">
-                <div class="pill active" data-val="daily" onclick="selectPurpose(this)">Daily Training</div>
-                <div class="pill" data-val="max" onclick="selectPurpose(this)">Max Cushioning</div>
-                <div class="pill" data-val="racing" onclick="selectPurpose(this)">Road Racing</div>
-                <div class="pill" data-val="super" onclick="selectPurpose(this)">Super Trainer</div>
-            </div>
-        </div>
-
+        <!-- 목적 & 사이즈 통합 휠 -->
         <div class="input-group" id="scan-section">
-            <label class="section-title">3. Target Size & Scan</label>
+            <label class="section-title" id="scan-label">3. Size & Scan</label>
             <div class="size-action-row">
                 <div class="picker-container" id="picker-main">
                     <div class="picker-mask"></div>
                     <div class="picker-highlight"></div>
+                    <!-- 스마트 추천 시에만 등장하는 목적 휠 -->
+                    <div class="wheel-col" id="wheel-purpose">
+                        <div class="wheel-spacer"></div>
+                        <div class="wheel-item selected" data-val="daily">Daily Train</div>
+                        <div class="wheel-item" data-val="max">Max Cushion</div>
+                        <div class="wheel-item" data-val="racing">Racing</div>
+                        <div class="wheel-item" data-val="super">Super Trainer</div>
+                        <div class="wheel-spacer"></div>
+                    </div>
                     <div class="wheel-col" id="wheel-gender">
                         <div class="wheel-spacer"></div>
                         <div class="wheel-item selected" data-val="USM">USM (Men)</div>
@@ -143,7 +146,7 @@
             <p id="status">Ready to scan</p>
         </div>
 
-        <!-- 검색 완료 후 나타나는 결과 정렬용 브랜드 필터 -->
+        <!-- 결과 정렬 브랜드 필터 -->
         <div id="filter-section">
             <label class="section-title">✨ Sort by Preferred Brands</label>
             <div class="pill-grid brand-grid">
@@ -160,26 +163,21 @@
         <div class="results-container" id="board"></div>
     </div>
 
-    <!-- 비밀 어드민 모달 창 -->
+    <!-- 어드민 모달 -->
     <div class="modal-overlay" id="adminModal">
         <div class="modal-content">
             <button class="close-modal" onclick="document.getElementById('adminModal').style.display='none'">×</button>
-            <h3 style="margin-top:0; color:#334155;">🛠 Admin Config</h3>
-            
+            <h3 style="margin-top:0; color:#334155; font-size:16px;">🛠 Admin Config</h3>
             <label class="section-title">Daily Training (Comma separated)</label>
             <input type="text" id="admin-daily" class="admin-input">
-            
             <label class="section-title">Max Cushioning</label>
             <input type="text" id="admin-max" class="admin-input">
-            
             <label class="section-title">Road Racing (Carbon)</label>
             <input type="text" id="admin-racing" class="admin-input">
-            
             <label class="section-title">Super Trainer</label>
             <input type="text" id="admin-super" class="admin-input">
-            
-            <button id="saveAdminBtn" class="btn-primary" style="height:44px; margin-top:10px;">SAVE CONFIG</button>
-            <p id="admin-status" style="text-align:center; color:#10b981; font-size:12px; font-weight:bold; display:none;">Saved Successfully!</p>
+            <button id="saveAdminBtn" class="btn-primary" style="margin-top:5px;">SAVE</button>
+            <p id="admin-status" style="text-align:center; color:#10b981; font-size:11px; font-weight:bold; display:none;">Saved!</p>
         </div>
     </div>
     
@@ -203,27 +201,34 @@
             else if (pwd !== null) { alert("Incorrect PIN"); }
         };
 
+        // 탭 전환 시 휠 UI 조절 (가운데 병합)
         function switchTab(mode) {
             currentMode = mode;
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             document.getElementById('tabBtn-' + mode).classList.add('active');
-            document.getElementById('content-' + mode).classList.add('active');
+            
+            const wPurpose = document.getElementById('wheel-purpose');
+            const wGender = document.getElementById('wheel-gender');
+            const wSize = document.getElementById('wheel-size');
+            
+            if (mode === 'direct') {
+                document.getElementById('content-direct').style.display = 'block';
+                document.getElementById('scan-label').innerText = '3. Size & Scan';
+                wPurpose.style.display = 'none';
+                wGender.style.width = '50%';
+                wSize.style.width = '50%';
+            } else {
+                document.getElementById('content-direct').style.display = 'none';
+                document.getElementById('scan-label').innerText = '2. Select Purpose & Size';
+                wPurpose.style.display = 'block';
+                wPurpose.style.width = '40%';
+                wGender.style.width = '30%';
+                wSize.style.width = '30%';
+            }
         }
 
         function toggleBtn(el) { el.classList.toggle('active'); }
-        
-        function selectPurpose(el) {
-            el.parentElement.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-            el.classList.add('active');
-            selPurpose = el.dataset.val;
-        }
-
-        // 검색 결과 렌더링 및 브랜드 상단 정렬 함수
-        function toggleFilter(el) {
-            el.classList.toggle('active');
-            renderBoard();
-        }
+        function toggleFilter(el) { el.classList.toggle('active'); renderBoard(); }
 
         function renderBoard() {
             let prefBrands = [];
@@ -236,7 +241,7 @@
                     let bLower = b.title.toLowerCase();
                     let aMatch = prefBrands.some(brand => aLower.includes(brand)) ? 1 : 0;
                     let bMatch = prefBrands.some(brand => bLower.includes(brand)) ? 1 : 0;
-                    return bMatch - aMatch; // 1점(매칭)인 항목을 상단으로
+                    return bMatch - aMatch;
                 });
             }
 
@@ -279,9 +284,7 @@
                 super: document.getElementById('admin-super').value
             };
             fetch('/api/config', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(newData)
+                method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(newData)
             }).then(r => r.json()).then(res => {
                 if(res.status === 'ok') {
                     shoeDB = newData;
@@ -293,9 +296,10 @@
         };
 
         let selPurpose = 'daily';
-        const sizes = [6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0, 10.5, 11.0, 11.5, 12.0, 12.5, 13.0];
         let selGender = 'USM';
         let selSize = '9.5';
+        
+        const sizes = [6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0, 10.5, 11.0, 11.5, 12.0, 12.5, 13.0];
         const sizeWheel = document.getElementById('wheel-size');
         const bSpacer = document.getElementById('bottom-spacer');
         sizes.forEach(sz => {
@@ -321,6 +325,7 @@
                 if (closest) { closest.classList.add('selected'); onChange(closest.dataset.val); }
             }, { passive: true });
         }
+        setupWheel('wheel-purpose', val => { selPurpose = val; });
         setupWheel('wheel-gender', val => { selGender = val; });
         setupWheel('wheel-size', val => { selSize = val; });
 
@@ -342,7 +347,7 @@
             } else {
                 let rawString = shoeDB[selPurpose];
                 k_list = rawString.split(',').map(s => s.trim()).filter(s => s);
-                let pText = document.querySelector(`.purpose-grid .pill[data-val="${selPurpose}"]`).innerText;
+                let pText = document.querySelector(`#wheel-purpose .wheel-item[data-val="${selPurpose}"]`).innerText;
                 searchLabel = `[${pText}]`;
             }
 
@@ -378,10 +383,8 @@
                 setTimeout(() => { pCont.style.display = 'none'; }, 800);
                 
                 lastScanData = data;
-                if(data.length > 0) {
-                    document.getElementById('filter-section').style.display = 'block';
-                }
-                renderBoard(); // 결과 화면 출력 (선호 브랜드 정렬 포함)
+                if(data.length > 0) { document.getElementById('filter-section').style.display = 'block'; }
+                renderBoard();
                 
                 stat.innerText = '✅ ' + data.length + ' item(s) found!';
                 stat.style.color = '#10b981';
