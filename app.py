@@ -103,10 +103,6 @@ def scan_store(name, url_base, kw, gender, size_num):
     except Exception: pass
     return res
 
-@app.route('/')
-def home():
-    return render_template('index.html')
-
 @app.route('/api/scan', methods=['POST'])
 def scan_api():
     try:
@@ -139,6 +135,10 @@ def scan_api():
         return jsonify(unique_data)
     except Exception:
         return jsonify([])
+
+@app.route('/')
+def home():
+    return render_template('index.html')
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))

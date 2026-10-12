@@ -3,8 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>ShoeTracker Pro</title>
     <style>
         * { box-sizing: border-box; }
@@ -14,10 +12,6 @@
         .input-group { margin-bottom: 20px; position: relative; }
         label.section-title { font-weight: 800; font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 10px; }
         
-        .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-        .chk-wrapper { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #334155; cursor: pointer; }
-        .chk-wrapper input[type='checkbox'] { width: 16px; height: 16px; cursor: pointer; accent-color: #3b82f6; }
-
         .tabs { display: flex; gap: 8px; margin-bottom: 20px; background: #f8fafc; padding: 5px; border-radius: 16px; border: 1.5px solid #e2e8f0; }
         .tab-btn { flex: 1; padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 800; color: #64748b; background: transparent; border: none; border-radius: 12px; cursor: pointer; transition: 0.2s; white-space: nowrap; }
         .tab-btn.active { background: #ffffff; color: #3b82f6; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
@@ -28,13 +22,25 @@
         input[type='text'] { padding: 14px 16px; width: 100%; border: 1.5px solid #e2e8f0; border-radius: 14px; font-size: 14px; font-weight: 600; background: #ffffff; color: #0f172a; outline: none; transition: all 0.2s; }
         input[type='text']:focus { border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); }
 
-        .pill-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .pill { background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 14px 10px; text-align: center; font-size: 13px; font-weight: 800; color: #64748b; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .pill-grid { display: grid; gap: 8px; margin-bottom: 15px; }
+        .pill { background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 14px 6px; text-align: center; font-size: 13px; font-weight: 800; color: #64748b; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .pill.active { background: #eff6ff; border-color: #3b82f6; color: #1d4ed8; box-shadow: 0 4px 10px rgba(59,130,246,0.15); }
 
-        /* 브랜드 필 스타일 (작고 여러개 선택 가능) */
-        .brand-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
-        .brand-grid .pill { padding: 10px 6px; font-size: 12px; }
+        /* 스토어 버튼: 균일 사이즈 & 말풍선 */
+        .store-grid { grid-template-columns: repeat(3, 1fr); margin-bottom: 20px; }
+        @media (max-width: 400px) { .store-grid { grid-template-columns: repeat(2, 1fr); } }
+        .store-grid .pill { font-size: 12px; padding: 12px 5px; position: relative; }
+        .store-grid .pill:hover::after {
+            content: attr(data-tooltip);
+            position: absolute; bottom: 115%; left: 50%; transform: translateX(-50%);
+            background: #1e293b; color: #ffffff; padding: 6px 10px; border-radius: 8px;
+            font-size: 11px; white-space: nowrap; z-index: 100; font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2); pointer-events: none;
+        }
+
+        .purpose-grid { grid-template-columns: 1fr 1fr; margin-bottom: 0; }
+        .brand-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
+        .brand-grid .pill { padding: 10px 4px; font-size: 11px; }
 
         .size-action-row { display: flex; flex-direction: column; gap: 12px; }
         .picker-container { width: 100%; height: 130px; background: #f8fafc; border-radius: 18px; border: 1.5px solid #e2e8f0; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; }
@@ -54,9 +60,11 @@
         #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #3b82f6, #a855f7, #ec4899); transition: width 0.3s; }
         #status { font-weight: 700; color: #64748b; margin-top: 10px; margin-bottom: 0; font-size: 13px; text-align: center; }
 
+        /* Filter & Results Area */
+        #filter-section { display: none; margin-top: 25px; background: #f8fafc; padding: 15px; border-radius: 16px; border: 1.5px dashed #cbd5e1; }
         .results-container { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
         .shoe-item-card { background: #ffffff; border: 1.5px solid #f1f5f9; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); position: relative; overflow: hidden; }
-        .pref-badge { position: absolute; top: 0; right: 0; background: #f59e0b; color: white; font-size: 9px; font-weight: 900; padding: 3px 8px; border-bottom-left-radius: 8px; }
+        .pref-badge { position: absolute; top: 0; right: 0; background: #f59e0b; color: white; font-size: 9px; font-weight: 900; padding: 4px 10px; border-bottom-left-radius: 10px; box-shadow: -2px 2px 5px rgba(0,0,0,0.1); }
         .card-header { display: flex; justify-content: space-between; align-items: center; }
         .badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; color: white; }
         .price-text { font-size: 16px; font-weight: 900; color: #10b981; }
@@ -78,28 +86,14 @@
         
         <div class="input-group">
             <label class="section-title">1. Target Stores</label>
-            <div class="checkbox-grid">
-                <label class="chk-wrapper"><input type="checkbox" class="store-cb" value="https://paceathletic.com" data-name="Pace Athletic" checked> Pace Athletic</label>
-                <label class="chk-wrapper"><input type="checkbox" class="store-cb" value="https://www.therunningshop.com.au" data-name="The Running Shop" checked> The Running Shop</label>
-                <label class="chk-wrapper"><input type="checkbox" class="store-cb" value="https://www.keeponrunning.com.au" data-name="Keep On Running" checked> Keep On Running</label>
-                <label class="chk-wrapper"><input type="checkbox" class="store-cb" value="https://shop.therunningcompany.com.au" data-name="Running Company" checked> Running Company</label>
-                <label class="chk-wrapper"><input type="checkbox" class="store-cb" value="https://rhavoc.com" data-name="Running Havoc" checked> Running Havoc</label>
-                <label class="chk-wrapper"><input type="checkbox" class="store-cb" value="https://solemotive.com" data-name="Sole Motive" checked> Sole Motive</label>
-                <label class="chk-wrapper" style="grid-column: 1 / -1;"><input type="checkbox" class="store-cb" value="https://runnersshop.com.au" data-name="Runners Shop" checked> Runners Shop</label>
-            </div>
-        </div>
-
-        <!-- 선호 브랜드 선택 영역 -->
-        <div class="input-group">
-            <label class="section-title">1-1. Preferred Brands (Top Sort)</label>
-            <div class="pill-grid brand-grid">
-                <div class="pill" data-val="asics" onclick="toggleBrand(this)">Asics</div>
-                <div class="pill" data-val="nike" onclick="toggleBrand(this)">Nike</div>
-                <div class="pill" data-val="on " onclick="toggleBrand(this)">On Running</div>
-                <div class="pill" data-val="hoka" onclick="toggleBrand(this)">Hoka</div>
-                <div class="pill" data-val="brooks" onclick="toggleBrand(this)">Brooks</div>
-                <div class="pill" data-val="saucony" onclick="toggleBrand(this)">Saucony</div>
-                <div class="pill" data-val="new balance" onclick="toggleBrand(this)">New Balance</div>
+            <div class="pill-grid store-grid">
+                <div class="pill active store-pill" data-val="https://paceathletic.com" data-name="Pace Athletic" data-tooltip="Pace Athletic" onclick="toggleBtn(this)">Pace</div>
+                <div class="pill active store-pill" data-val="https://www.therunningshop.com.au" data-name="The Running Shop" data-tooltip="The Running Shop" onclick="toggleBtn(this)">Running Shop</div>
+                <div class="pill active store-pill" data-val="https://www.keeponrunning.com.au" data-name="Keep On Running" data-tooltip="Keep On Running" onclick="toggleBtn(this)">Keep On</div>
+                <div class="pill active store-pill" data-val="https://shop.therunningcompany.com.au" data-name="Running Company" data-tooltip="Running Company" onclick="toggleBtn(this)">Company</div>
+                <div class="pill active store-pill" data-val="https://rhavoc.com" data-name="Running Havoc" data-tooltip="Running Havoc" onclick="toggleBtn(this)">Havoc</div>
+                <div class="pill active store-pill" data-val="https://solemotive.com" data-name="Sole Motive" data-tooltip="Sole Motive" onclick="toggleBtn(this)">Sole Motive</div>
+                <div class="pill active store-pill" data-val="https://runnersshop.com.au" data-name="Runners Shop" data-tooltip="Runners Shop" onclick="toggleBtn(this)" style="grid-column: 1 / -1;">Runners Shop</div>
             </div>
         </div>
 
@@ -116,10 +110,10 @@
         <div class="input-group tab-content" id="content-smart">
             <label class="section-title">2. Running Purpose</label>
             <div class="pill-grid purpose-grid" style="margin-bottom:0;">
-                <div class="pill active" data-val="daily" onclick="selectPill(this)">Daily Training</div>
-                <div class="pill" data-val="max" onclick="selectPill(this)">Max Cushioning</div>
-                <div class="pill" data-val="racing" onclick="selectPill(this)">Road Racing</div>
-                <div class="pill" data-val="super" onclick="selectPill(this)">Super Trainer</div>
+                <div class="pill active" data-val="daily" onclick="selectPurpose(this)">Daily Training</div>
+                <div class="pill" data-val="max" onclick="selectPurpose(this)">Max Cushioning</div>
+                <div class="pill" data-val="racing" onclick="selectPurpose(this)">Road Racing</div>
+                <div class="pill" data-val="super" onclick="selectPurpose(this)">Super Trainer</div>
             </div>
         </div>
 
@@ -147,6 +141,20 @@
             </div>
             <div id="progress-container"><div id="progress-bar"></div></div>
             <p id="status">Ready to scan</p>
+        </div>
+
+        <!-- 검색 완료 후 나타나는 결과 정렬용 브랜드 필터 -->
+        <div id="filter-section">
+            <label class="section-title">✨ Sort by Preferred Brands</label>
+            <div class="pill-grid brand-grid">
+                <div class="pill" data-val="asics" onclick="toggleFilter(this)">Asics</div>
+                <div class="pill" data-val="nike" onclick="toggleFilter(this)">Nike</div>
+                <div class="pill" data-val="on " onclick="toggleFilter(this)">On Running</div>
+                <div class="pill" data-val="hoka" onclick="toggleFilter(this)">Hoka</div>
+                <div class="pill" data-val="brooks" onclick="toggleFilter(this)">Brooks</div>
+                <div class="pill" data-val="saucony" onclick="toggleFilter(this)">Saucony</div>
+                <div class="pill" data-val="new balance" onclick="toggleFilter(this)">New Balance</div>
+            </div>
         </div>
         
         <div class="results-container" id="board"></div>
@@ -178,6 +186,8 @@
     <script>
         let currentMode = 'direct';
         let shoeDB = {};
+        let lastScanData = [];
+        let fullSizeText = '';
 
         fetch('/api/config').then(r => r.json()).then(data => {
             shoeDB = data;
@@ -187,14 +197,10 @@
             document.getElementById('admin-super').value = data.super;
         });
 
-        // 비밀번호 체크 로직
         document.getElementById('admin-trigger').onclick = function() {
             const pwd = prompt("Enter Admin PIN:");
-            if (pwd === "7777") {
-                document.getElementById('adminModal').style.display = 'flex';
-            } else if (pwd !== null) {
-                alert("Incorrect PIN");
-            }
+            if (pwd === "7777") { document.getElementById('adminModal').style.display = 'flex'; } 
+            else if (pwd !== null) { alert("Incorrect PIN"); }
         };
 
         function switchTab(mode) {
@@ -205,9 +211,64 @@
             document.getElementById('content-' + mode).classList.add('active');
         }
 
-        // 선호 브랜드 다중 선택
-        function toggleBrand(el) {
+        function toggleBtn(el) { el.classList.toggle('active'); }
+        
+        function selectPurpose(el) {
+            el.parentElement.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+            el.classList.add('active');
+            selPurpose = el.dataset.val;
+        }
+
+        // 검색 결과 렌더링 및 브랜드 상단 정렬 함수
+        function toggleFilter(el) {
             el.classList.toggle('active');
+            renderBoard();
+        }
+
+        function renderBoard() {
+            let prefBrands = [];
+            document.querySelectorAll('.brand-grid .pill.active').forEach(p => { prefBrands.push(p.dataset.val); });
+            
+            let displayData = [...lastScanData];
+            if (prefBrands.length > 0) {
+                displayData.sort((a, b) => {
+                    let aLower = a.title.toLowerCase();
+                    let bLower = b.title.toLowerCase();
+                    let aMatch = prefBrands.some(brand => aLower.includes(brand)) ? 1 : 0;
+                    let bMatch = prefBrands.some(brand => bLower.includes(brand)) ? 1 : 0;
+                    return bMatch - aMatch; // 1점(매칭)인 항목을 상단으로
+                });
+            }
+
+            let html = '';
+            if(displayData.length === 0) {
+                html = '<div class="no-result">No matching shoes found.</div>';
+            } else {
+                displayData.forEach(item => {
+                    let bg = '#64748b';
+                    if(item.store.includes('Running Shop') || item.store.includes('Runners Shop')) bg = '#ef4444';
+                    else if(item.store.includes('Keep On')) bg = '#f59e0b';
+                    else if(item.store.includes('Running Company')) bg = '#6366f1';
+                    else if(item.store.includes('Pace')) bg = '#0f172a';
+                    else if(item.store.includes('Havoc') || item.store.includes('Sole')) bg = '#10b981';
+                    
+                    let tLower = item.title.toLowerCase();
+                    let isPref = prefBrands.some(brand => tLower.includes(brand));
+
+                    html += '<div class="shoe-item-card">';
+                    if (isPref) html += '<div class="pref-badge">⭐ PREFERRED</div>';
+                    html += '  <div class="card-header">';
+                    html += '    <span class="badge" style="background:' + bg + '">' + item.store + '</span>';
+                    html += '    <span class="price-text">$' + item.price.toFixed(2) + '</span>';
+                    html += '  </div>';
+                    html += '  <div class="card-body">';
+                    html += '    <div class="shoe-title">' + item.title + '</div>';
+                    html += '    <a href="' + item.url + '" target="_blank" class="btn-link">Buy (' + fullSizeText + ')</a>';
+                    html += '  </div>';
+                    html += '</div>';
+                });
+            }
+            document.getElementById('board').innerHTML = html;
         }
 
         document.getElementById('saveAdminBtn').onclick = function() {
@@ -232,12 +293,6 @@
         };
 
         let selPurpose = 'daily';
-        function selectPill(el) {
-            el.parentElement.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-            el.classList.add('active');
-            selPurpose = el.dataset.val;
-        }
-
         const sizes = [6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0, 10.5, 11.0, 11.5, 12.0, 12.5, 13.0];
         let selGender = 'USM';
         let selSize = '9.5';
@@ -275,14 +330,8 @@
             if (isScanning) { if (abortCtrl) abortCtrl.abort(); return; }
             
             let activeStores = [];
-            document.querySelectorAll('.store-cb:checked').forEach(cb => { activeStores.push({name: cb.dataset.name, url: cb.value}); });
+            document.querySelectorAll('.store-pill.active').forEach(p => { activeStores.push({name: p.dataset.name, url: p.dataset.val}); });
             if(activeStores.length === 0) { alert('Please select at least one store!'); return; }
-
-            // 선호 브랜드 수집
-            let prefBrands = [];
-            document.querySelectorAll('.brand-grid .pill.active').forEach(p => {
-                prefBrands.push(p.dataset.val);
-            });
 
             let k_list = [];
             let searchLabel = "";
@@ -300,6 +349,7 @@
             isScanning = true;
             document.getElementById('picker-main').style.pointerEvents = 'none';
             document.getElementById('picker-main').style.opacity = '0.5';
+            document.getElementById('filter-section').style.display = 'none';
             
             const btn = this, stat = document.getElementById('status'), brd = document.getElementById('board'), pCont = document.getElementById('progress-container'), pBar = document.getElementById('progress-bar');
             document.getElementById('btnIcon').innerText = '⏹';
@@ -314,7 +364,7 @@
             let progW = 0; clearInterval(progInt);
             progInt = setInterval(() => { if (progW < 90) { progW += (90 - progW) / 10; pBar.style.width = progW + '%'; } }, 500);
 
-            const fullSize = selGender + ' ' + selSize;
+            fullSizeText = selGender + ' ' + selSize;
             abortCtrl = new AbortController();
             fetch('/api/scan', {
                 method: 'POST',
@@ -327,46 +377,12 @@
                 clearInterval(progInt); pBar.style.width = '100%';
                 setTimeout(() => { pCont.style.display = 'none'; }, 800);
                 
-                let html = '';
-                if(data.length === 0) {
-                    html = '<div class="no-result">No matching shoes found.</div>';
-                } else {
-                    // 🔥 선호 브랜드 상단 노출 정렬 로직 🔥
-                    if (prefBrands.length > 0) {
-                        data.sort((a, b) => {
-                            let aLower = a.title.toLowerCase();
-                            let bLower = b.title.toLowerCase();
-                            let aMatch = prefBrands.some(brand => aLower.includes(brand)) ? 1 : 0;
-                            let bMatch = prefBrands.some(brand => bLower.includes(brand)) ? 1 : 0;
-                            return bMatch - aMatch; // 선택된 브랜드가 1점(상단)을 받음
-                        });
-                    }
-
-                    data.forEach(item => {
-                        let bg = '#64748b';
-                        if(item.store.includes('Running Shop') || item.store.includes('Runners Shop')) bg = '#ef4444';
-                        else if(item.store.includes('Keep On')) bg = '#f59e0b';
-                        else if(item.store.includes('Running Company')) bg = '#6366f1';
-                        else if(item.store.includes('Pace')) bg = '#0f172a';
-                        else if(item.store.includes('Havoc') || item.store.includes('Sole')) bg = '#10b981';
-                        
-                        let tLower = item.title.toLowerCase();
-                        let isPref = prefBrands.some(brand => tLower.includes(brand));
-
-                        html += '<div class="shoe-item-card">';
-                        if (isPref) html += '<div class="pref-badge">⭐ PREFERRED</div>';
-                        html += '  <div class="card-header">';
-                        html += '    <span class="badge" style="background:' + bg + '">' + item.store + '</span>';
-                        html += '    <span class="price-text">$' + item.price.toFixed(2) + '</span>';
-                        html += '  </div>';
-                        html += '  <div class="card-body">';
-                        html += '    <div class="shoe-title">' + item.title + '</div>';
-                        html += '    <a href="' + item.url + '" target="_blank" class="btn-link">Buy (' + fullSize + ')</a>';
-                        html += '  </div>';
-                        html += '</div>';
-                    });
+                lastScanData = data;
+                if(data.length > 0) {
+                    document.getElementById('filter-section').style.display = 'block';
                 }
-                brd.innerHTML = html;
+                renderBoard(); // 결과 화면 출력 (선호 브랜드 정렬 포함)
+                
                 stat.innerText = '✅ ' + data.length + ' item(s) found!';
                 stat.style.color = '#10b981';
             })
