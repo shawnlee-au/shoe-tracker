@@ -27,10 +27,14 @@
 
         input[type='text'] { padding: 14px 16px; width: 100%; border: 1.5px solid #e2e8f0; border-radius: 14px; font-size: 14px; font-weight: 600; background: #ffffff; color: #0f172a; outline: none; transition: all 0.2s; }
         input[type='text']:focus { border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); }
-        
+
         .pill-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .pill { background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 14px 10px; text-align: center; font-size: 13px; font-weight: 800; color: #64748b; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .pill.active { background: #eff6ff; border-color: #3b82f6; color: #1d4ed8; box-shadow: 0 4px 10px rgba(59,130,246,0.15); }
+
+        /* 브랜드 필 스타일 (작고 여러개 선택 가능) */
+        .brand-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
+        .brand-grid .pill { padding: 10px 6px; font-size: 12px; }
 
         .size-action-row { display: flex; flex-direction: column; gap: 12px; }
         .picker-container { width: 100%; height: 130px; background: #f8fafc; border-radius: 18px; border: 1.5px solid #e2e8f0; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; }
@@ -51,7 +55,8 @@
         #status { font-weight: 700; color: #64748b; margin-top: 10px; margin-bottom: 0; font-size: 13px; text-align: center; }
 
         .results-container { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
-        .shoe-item-card { background: #ffffff; border: 1.5px solid #f1f5f9; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .shoe-item-card { background: #ffffff; border: 1.5px solid #f1f5f9; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); position: relative; overflow: hidden; }
+        .pref-badge { position: absolute; top: 0; right: 0; background: #f59e0b; color: white; font-size: 9px; font-weight: 900; padding: 3px 8px; border-bottom-left-radius: 8px; }
         .card-header { display: flex; justify-content: space-between; align-items: center; }
         .badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; color: white; }
         .price-text { font-size: 16px; font-weight: 900; color: #10b981; }
@@ -84,6 +89,20 @@
             </div>
         </div>
 
+        <!-- 선호 브랜드 선택 영역 -->
+        <div class="input-group">
+            <label class="section-title">1-1. Preferred Brands (Top Sort)</label>
+            <div class="pill-grid brand-grid">
+                <div class="pill" data-val="asics" onclick="toggleBrand(this)">Asics</div>
+                <div class="pill" data-val="nike" onclick="toggleBrand(this)">Nike</div>
+                <div class="pill" data-val="on " onclick="toggleBrand(this)">On Running</div>
+                <div class="pill" data-val="hoka" onclick="toggleBrand(this)">Hoka</div>
+                <div class="pill" data-val="brooks" onclick="toggleBrand(this)">Brooks</div>
+                <div class="pill" data-val="saucony" onclick="toggleBrand(this)">Saucony</div>
+                <div class="pill" data-val="new balance" onclick="toggleBrand(this)">New Balance</div>
+            </div>
+        </div>
+
         <div class="tabs">
             <button class="tab-btn active" id="tabBtn-direct" onclick="switchTab('direct')">🔍 Direct Search</button>
             <button class="tab-btn" id="tabBtn-smart" onclick="switchTab('smart')">💡 Recommend</button>
@@ -100,7 +119,7 @@
                 <div class="pill active" data-val="daily" onclick="selectPill(this)">Daily Training</div>
                 <div class="pill" data-val="max" onclick="selectPill(this)">Max Cushioning</div>
                 <div class="pill" data-val="racing" onclick="selectPill(this)">Road Racing</div>
-                <div class="pill" data-val="super" onclick="selectPill(this)">Super Training</div>
+                <div class="pill" data-val="super" onclick="selectPill(this)">Super Trainer</div>
             </div>
         </div>
 
@@ -148,7 +167,7 @@
             <label class="section-title">Road Racing (Carbon)</label>
             <input type="text" id="admin-racing" class="admin-input">
             
-            <label class="section-title">Super Training</label>
+            <label class="section-title">Super Trainer</label>
             <input type="text" id="admin-super" class="admin-input">
             
             <button id="saveAdminBtn" class="btn-primary" style="height:44px; margin-top:10px;">SAVE CONFIG</button>
@@ -184,6 +203,11 @@
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             document.getElementById('tabBtn-' + mode).classList.add('active');
             document.getElementById('content-' + mode).classList.add('active');
+        }
+
+        // 선호 브랜드 다중 선택
+        function toggleBrand(el) {
+            el.classList.toggle('active');
         }
 
         document.getElementById('saveAdminBtn').onclick = function() {
@@ -254,6 +278,12 @@
             document.querySelectorAll('.store-cb:checked').forEach(cb => { activeStores.push({name: cb.dataset.name, url: cb.value}); });
             if(activeStores.length === 0) { alert('Please select at least one store!'); return; }
 
+            // 선호 브랜드 수집
+            let prefBrands = [];
+            document.querySelectorAll('.brand-grid .pill.active').forEach(p => {
+                prefBrands.push(p.dataset.val);
+            });
+
             let k_list = [];
             let searchLabel = "";
             if (currentMode === 'direct') {
@@ -301,6 +331,17 @@
                 if(data.length === 0) {
                     html = '<div class="no-result">No matching shoes found.</div>';
                 } else {
+                    // 🔥 선호 브랜드 상단 노출 정렬 로직 🔥
+                    if (prefBrands.length > 0) {
+                        data.sort((a, b) => {
+                            let aLower = a.title.toLowerCase();
+                            let bLower = b.title.toLowerCase();
+                            let aMatch = prefBrands.some(brand => aLower.includes(brand)) ? 1 : 0;
+                            let bMatch = prefBrands.some(brand => bLower.includes(brand)) ? 1 : 0;
+                            return bMatch - aMatch; // 선택된 브랜드가 1점(상단)을 받음
+                        });
+                    }
+
                     data.forEach(item => {
                         let bg = '#64748b';
                         if(item.store.includes('Running Shop') || item.store.includes('Runners Shop')) bg = '#ef4444';
@@ -309,10 +350,14 @@
                         else if(item.store.includes('Pace')) bg = '#0f172a';
                         else if(item.store.includes('Havoc') || item.store.includes('Sole')) bg = '#10b981';
                         
+                        let tLower = item.title.toLowerCase();
+                        let isPref = prefBrands.some(brand => tLower.includes(brand));
+
                         html += '<div class="shoe-item-card">';
+                        if (isPref) html += '<div class="pref-badge">⭐ PREFERRED</div>';
                         html += '  <div class="card-header">';
                         html += '    <span class="badge" style="background:' + bg + '">' + item.store + '</span>';
-                        html += '    <span class="price-text">' + item.price + '</span>';
+                        html += '    <span class="price-text">$' + item.price.toFixed(2) + '</span>';
                         html += '  </div>';
                         html += '  <div class="card-body">';
                         html += '    <div class="shoe-title">' + item.title + '</div>';

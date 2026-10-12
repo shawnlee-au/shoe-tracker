@@ -9,7 +9,6 @@ else: ssl._create_default_https_context = _create_unverified_https_context
 app = Flask(__name__)
 
 DB_FILE = 'shoe_db.json'
-# 사용자 맞춤형 초기 데이터 영구 저장
 DEFAULT_DB = {
     "daily": "Novablast, Pegasus, Clifton, Ghost, Ultraboost, Vomero Plus, Deviate nitro, Ride, Cloud monster, Adizero EVO SL, Rebel V5",
     "max": "Nimbus, 1080, Bondi, Invincible, Ghost Max, Vomero Premium, Glycerin Max, Magmax Nitro",
@@ -97,7 +96,7 @@ def scan_store(name, url_base, kw, gender, size_num):
                         p = float(v.get('price', 0)) / 100
                         v_id = v.get('id')
                         final_url = f"{p_url}?variant={v_id}" if v_id else p_url
-                        res.append({"store": name, "title": t, "price": f"${p:.2f}", "url": final_url})
+                        res.append({"store": name, "title": t, "price": p, "url": final_url})
                         seen_titles.add(tl)
                         break
             except Exception: pass
