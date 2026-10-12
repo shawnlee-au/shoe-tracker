@@ -9,23 +9,12 @@ else: ssl._create_default_https_context = _create_unverified_https_context
 app = Flask(__name__)
 
 DB_FILE = 'shoe_db.json'
+# 사용자 맞춤형 초기 데이터 영구 저장
 DEFAULT_DB = {
-    "daily": {
-        "latest": "Novablast 4, Pegasus 41, Clifton 9, 880 v14, Ghost 16",
-        "value": "Novablast 3, Pegasus 40, Clifton 8, 880 v13, Ghost 15"
-    },
-    "max": {
-        "latest": "Nimbus 26, 1080 v13, Bondi 8, Invincible 3, Ghost Max",
-        "value": "Nimbus 25, 1080 v12, Bondi 7, Invincible 2"
-    },
-    "racing": {
-        "latest": "Vaporfly 3, Alphafly 3, Metaspeed Sky, Endorphin Pro 4",
-        "value": "Vaporfly 2, Alphafly 2, Endorphin Pro 3"
-    },
-    "super": {
-        "latest": "Superblast 2, Mach X 2, SC Trainer v3, Endorphin Speed 4",
-        "value": "Superblast, Mach X, SC Trainer v2, Endorphin Speed 3"
-    }
+    "daily": "Novablast, Pegasus, Clifton, Ghost, Ultraboost, Vomero Plus, Deviate nitro, Ride, Cloud monster, Adizero EVO SL, Rebel V5",
+    "max": "Nimbus, 1080, Bondi, Invincible, Ghost Max, Vomero Premium, Glycerin Max, Magmax Nitro",
+    "racing": "Vaporfly, Alphafly, Metaspeed, Endorphin Pro, Endorphin Elite, Cloudboom Strike",
+    "super": "Superblast, SC Trainer, Megablast, Cloudboom Echo"
 }
 
 def get_db():
@@ -64,8 +53,6 @@ def scan_store(name, url_base, kw, gender, size_num):
         
         for h in handles:
             hl = h.lower().replace('-', ' ')
-            # 🔥 차단(429 Error) 방지 핵심 기술 🔥
-            # 무작정 상세 페이지를 열지 않고, 인터넷 주소(handle)에 내가 찾는 신발 이름이 포함되어 있을 때만 접근
             if kl_words and not all(w in hl for w in kl_words):
                 continue
                 
