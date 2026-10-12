@@ -1,4 +1,4 @@
-import os, json, urllib.request, re, ssl
+import os, json, urllib.request, re, ssl, urllib.parse
 from flask import Flask, request, jsonify, render_template
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -48,29 +48,33 @@ def config_api():
 def scan_store(name, url_base, kw, gender, size_num):
     res = []
     seen_titles = set()
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
     try:
         url_base = url_base.rstrip('/')
-        words = kw.strip().split()
-        search_term = words[0] if words else "running+shoes"
-        search_url = f"{url_base}/search?q={search_term}"
+        kw = kw.strip()
+        search_term = urllib.parse.quote(kw) if kw else "running shoes"
+        search_url = f"{url_base}/search?q={search_term}&type=product"
         
-        req = urllib.request.Request(search_url, headers={'User-Agent': 'Mozilla/5.0'})
-        html = urllib.request.urlopen(req, timeout=10).read().decode('utf-8')
+        req = urllib.request.Request(search_url, headers=headers)
+        html = urllib.request.urlopen(req, timeout=8).read().decode('utf-8')
         handles = list(dict.fromkeys(re.findall(r'href="[^"]*/products/([^"?/#]+)', html)))
         
-        kl_words = [w.lower() for w in words]
+        kl_words = [w.lower() for w in kw.split()]
         target_f = float(size_num)
         
-        for h in handles[:25]:
+        for h in handles:
+            hl = h.lower().replace('-', ' ')
+            # 🔥 차단(429 Error) 방지 핵심 기술 🔥
+            # 무작정 상세 페이지를 열지 않고, 인터넷 주소(handle)에 내가 찾는 신발 이름이 포함되어 있을 때만 접근
+            if kl_words and not all(w in hl for w in kl_words):
+                continue
+                
             try:
                 p_url = f"{url_base}/products/{h}"
-                j_req = urllib.request.Request(f"{p_url}.js", headers={'User-Agent': 'Mozilla/5.0'})
+                j_req = urllib.request.Request(f"{p_url}.js", headers=headers)
                 j_data = json.loads(urllib.request.urlopen(j_req, timeout=5).read().decode('utf-8'))
                 t = j_data.get('title', h)
-                tl = t.lower().replace('-', ' ')
-                
-                # 유연한 키워드 매칭: 띄어쓰기 무시 및 부분 단어 확인
-                if kl_words and not all(w in tl for w in kl_words): continue
+                tl = t.lower()
                 
                 is_womens_shoe = 'women' in tl or 'wmns' in tl
                 is_unisex_shoe = 'unisex' in tl
@@ -126,15 +130,14 @@ def scan_api():
         size_num = req.get('s', '9.5')
         stores = req.get('stores', [])
         
-        if not k_list: k_list = ['']
-        k_list = [k.strip() for k in k_list if k.strip()]
+        filtered_k = [k.strip() for k in k_list if k.strip()]
+        if not filtered_k: filtered_k = ['']
 
         data = []
-        # Shopify 차단 방지를 위해 최대 스레드를 5개로 제한
-        with ThreadPoolExecutor(max_workers=5) as executor:
+        with ThreadPoolExecutor(max_workers=8) as executor:
             futures = []
             for s in stores:
-                for kw in k_list:
+                for kw in filtered_k:
                     futures.append(executor.submit(scan_store, s['name'], s['url'], kw, gender, size_num))
             for future in as_completed(futures):
                 try: data.extend(future.result())
