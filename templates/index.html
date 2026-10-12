@@ -18,15 +18,17 @@
         .chk-wrapper { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #334155; cursor: pointer; }
         .chk-wrapper input[type='checkbox'] { width: 16px; height: 16px; cursor: pointer; accent-color: #3b82f6; }
 
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; background: #f8fafc; padding: 5px; border-radius: 16px; border: 1.5px solid #e2e8f0; }
-        .tab-btn { flex: 1; padding: 12px; text-align: center; font-size: 14px; font-weight: 800; color: #64748b; background: transparent; border: none; border-radius: 12px; cursor: pointer; transition: 0.2s; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; background: #f8fafc; padding: 5px; border-radius: 16px; border: 1.5px solid #e2e8f0; }
+        .tab-btn { flex: 1; padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 800; color: #64748b; background: transparent; border: none; border-radius: 12px; cursor: pointer; transition: 0.2s; white-space: nowrap; }
         .tab-btn.active { background: #ffffff; color: #3b82f6; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        input[type='text'] { padding: 14px 16px; width: 100%; border: 1.5px solid #e2e8f0; border-radius: 14px; font-size: 15px; font-weight: 600; background: #ffffff; color: #0f172a; outline: none; transition: all 0.2s; }
+        input[type='text'] { padding: 14px 16px; width: 100%; border: 1.5px solid #e2e8f0; border-radius: 14px; font-size: 14px; font-weight: 600; background: #ffffff; color: #0f172a; outline: none; transition: all 0.2s; }
         input[type='text']:focus { border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); }
+        
+        .admin-input { margin-bottom: 6px; padding: 12px 14px; font-size: 13px; background: #f8fafc; }
 
         .pill-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .pill { background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 14px 10px; text-align: center; font-size: 13px; font-weight: 800; color: #64748b; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
@@ -66,7 +68,7 @@
         <h2>👟 ShoeTracker Pro</h2>
         
         <div class="input-group">
-            <label class="section-title">1. Select Target Stores</label>
+            <label class="section-title">1. Target Stores</label>
             <div class="checkbox-grid">
                 <label class="chk-wrapper"><input type="checkbox" class="store-cb" value="https://paceathletic.com" data-name="Pace Athletic" checked> Pace Athletic</label>
                 <label class="chk-wrapper"><input type="checkbox" class="store-cb" value="https://www.therunningshop.com.au" data-name="The Running Shop" checked> The Running Shop</label>
@@ -79,8 +81,9 @@
         </div>
 
         <div class="tabs">
-            <button class="tab-btn active" id="tabBtn-direct" onclick="switchTab('direct')">🔍 직접 검색</button>
-            <button class="tab-btn" id="tabBtn-smart" onclick="switchTab('smart')">💡 스마트 추천</button>
+            <button class="tab-btn active" id="tabBtn-direct" onclick="switchTab('direct')">🔍 Direct Search</button>
+            <button class="tab-btn" id="tabBtn-smart" onclick="switchTab('smart')">💡 Recommend</button>
+            <button class="tab-btn" id="tabBtn-admin" onclick="switchTab('admin')">⚙️ Admin</button>
         </div>
 
         <div class="input-group tab-content active" id="content-direct">
@@ -89,21 +92,42 @@
         </div>
 
         <div class="input-group tab-content" id="content-smart">
-            <label class="section-title">2-1. 러닝 목적 선택</label>
+            <label class="section-title">2-1. Running Purpose</label>
             <div class="pill-grid purpose-grid">
-                <div class="pill active" data-val="daily" onclick="selectPill(this, 'purpose')">데일리 트레이닝</div>
-                <div class="pill" data-val="max" onclick="selectPill(this, 'purpose')">맥스 쿠셔닝</div>
-                <div class="pill" data-val="racing" onclick="selectPill(this, 'purpose')">로드 레이싱(카본화)</div>
-                <div class="pill" data-val="super" onclick="selectPill(this, 'purpose')">수퍼 트레이닝</div>
+                <div class="pill active" data-val="daily" onclick="selectPill(this, 'purpose')">Daily Training</div>
+                <div class="pill" data-val="max" onclick="selectPill(this, 'purpose')">Max Cushioning</div>
+                <div class="pill" data-val="racing" onclick="selectPill(this, 'purpose')">Road Racing</div>
+                <div class="pill" data-val="super" onclick="selectPill(this, 'purpose')">Super Training</div>
             </div>
-            <label class="section-title">2-2. 신발 버전 선택</label>
+            <label class="section-title">2-2. Shoe Version</label>
             <div class="pill-grid version-grid" style="margin-bottom:0;">
-                <div class="pill active" data-val="latest" onclick="selectPill(this, 'version')">🆕 최신형 신상</div>
-                <div class="pill" data-val="value" onclick="selectPill(this, 'version')">💰 직전 가성비 모델</div>
+                <div class="pill active" data-val="latest" onclick="selectPill(this, 'version')">🆕 Latest Models</div>
+                <div class="pill" data-val="value" onclick="selectPill(this, 'version')">💰 Value Models</div>
             </div>
         </div>
 
-        <div class="input-group">
+        <div class="input-group tab-content" id="content-admin">
+            <label class="section-title">Daily Training (Comma separated)</label>
+            <input type="text" id="admin-daily-latest" class="admin-input" placeholder="Latest (e.g. Novablast 4)">
+            <input type="text" id="admin-daily-value" class="admin-input" placeholder="Value (e.g. Novablast 3)" style="margin-bottom:15px;">
+            
+            <label class="section-title">Max Cushioning</label>
+            <input type="text" id="admin-max-latest" class="admin-input" placeholder="Latest models">
+            <input type="text" id="admin-max-value" class="admin-input" placeholder="Value models" style="margin-bottom:15px;">
+            
+            <label class="section-title">Road Racing (Carbon)</label>
+            <input type="text" id="admin-racing-latest" class="admin-input" placeholder="Latest models">
+            <input type="text" id="admin-racing-value" class="admin-input" placeholder="Value models" style="margin-bottom:15px;">
+            
+            <label class="section-title">Super Training</label>
+            <input type="text" id="admin-super-latest" class="admin-input" placeholder="Latest models">
+            <input type="text" id="admin-super-value" class="admin-input" placeholder="Value models" style="margin-bottom:15px;">
+            
+            <button id="saveAdminBtn" class="btn-primary" style="height:44px; margin-top:5px;">SAVE CONFIG</button>
+            <p id="admin-status" style="text-align:center; color:#10b981; font-size:12px; font-weight:bold; display:none;">Saved Successfully!</p>
+        </div>
+
+        <div class="input-group" id="scan-section">
             <label class="section-title">3. Target Size & Scan</label>
             <div class="size-action-row">
                 <div class="picker-container" id="picker-main">
@@ -134,13 +158,59 @@
     
     <script>
         let currentMode = 'direct';
+        let shoeDB = {};
+
+        // 초기 데이터 로딩
+        fetch('/api/config').then(r => r.json()).then(data => {
+            shoeDB = data;
+            document.getElementById('admin-daily-latest').value = data.daily.latest;
+            document.getElementById('admin-daily-value').value = data.daily.value;
+            document.getElementById('admin-max-latest').value = data.max.latest;
+            document.getElementById('admin-max-value').value = data.max.value;
+            document.getElementById('admin-racing-latest').value = data.racing.latest;
+            document.getElementById('admin-racing-value').value = data.racing.value;
+            document.getElementById('admin-super-latest').value = data.super.latest;
+            document.getElementById('admin-super-value').value = data.super.value;
+        });
+
+        // 탭 전환
         function switchTab(mode) {
             currentMode = mode;
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             document.getElementById('tabBtn-' + mode).classList.add('active');
             document.getElementById('content-' + mode).classList.add('active');
+            
+            if (mode === 'admin') {
+                document.getElementById('scan-section').style.display = 'none';
+                document.getElementById('board').style.display = 'none';
+            } else {
+                document.getElementById('scan-section').style.display = 'block';
+                document.getElementById('board').style.display = 'flex';
+            }
         }
+
+        // 어드민 설정 저장
+        document.getElementById('saveAdminBtn').onclick = function() {
+            const newData = {
+                daily: { latest: document.getElementById('admin-daily-latest').value, value: document.getElementById('admin-daily-value').value },
+                max: { latest: document.getElementById('admin-max-latest').value, value: document.getElementById('admin-max-value').value },
+                racing: { latest: document.getElementById('admin-racing-latest').value, value: document.getElementById('admin-racing-value').value },
+                super: { latest: document.getElementById('admin-super-latest').value, value: document.getElementById('admin-super-value').value }
+            };
+            fetch('/api/config', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(newData)
+            }).then(r => r.json()).then(res => {
+                if(res.status === 'ok') {
+                    shoeDB = newData;
+                    const st = document.getElementById('admin-status');
+                    st.style.display = 'block';
+                    setTimeout(() => st.style.display = 'none', 3000);
+                }
+            });
+        };
 
         let selPurpose = 'daily';
         let selVersion = 'latest';
@@ -182,25 +252,6 @@
         setupWheel('wheel-gender', val => { selGender = val; });
         setupWheel('wheel-size', val => { selSize = val; });
 
-        const shoeDB = {
-            daily: {
-                latest: ['Novablast 4', 'Pegasus 41', 'Clifton 9', '880 v14', 'Ghost 16'],
-                value: ['Novablast 3', 'Pegasus 40', 'Clifton 8', '880 v13', 'Ghost 15']
-            },
-            max: {
-                latest: ['Nimbus 26', '1080 v13', 'Bondi 8', 'Invincible 3', 'Ghost Max'],
-                value: ['Nimbus 25', '1080 v12', 'Bondi 7', 'Invincible 2']
-            },
-            racing: {
-                latest: ['Vaporfly 3', 'Alphafly 3', 'Metaspeed Sky Paris', 'Endorphin Pro 4'],
-                value: ['Vaporfly 2', 'Alphafly 2', 'Metaspeed Sky+', 'Endorphin Pro 3']
-            },
-            super: {
-                latest: ['Superblast 2', 'Mach X 2', 'SC Trainer v3', 'Endorphin Speed 4'],
-                value: ['Superblast', 'Mach X', 'SC Trainer v2', 'Endorphin Speed 3']
-            }
-        };
-
         let abortCtrl = null, isScanning = false, progInt = null;
         
         document.getElementById('scanBtn').onclick = function() {
@@ -208,7 +259,7 @@
             
             let activeStores = [];
             document.querySelectorAll('.store-cb:checked').forEach(cb => { activeStores.push({name: cb.dataset.name, url: cb.value}); });
-            if(activeStores.length === 0) { alert('최소 1개 이상의 스토어를 선택해주세요!'); return; }
+            if(activeStores.length === 0) { alert('Please select at least one store!'); return; }
 
             let k_list = [];
             let searchLabel = "";
@@ -217,7 +268,8 @@
                 if (val) k_list = [val];
                 searchLabel = val ? "'" + val + "'" : "ALL SHOES";
             } else {
-                k_list = shoeDB[selPurpose][selVersion];
+                let rawString = shoeDB[selPurpose][selVersion];
+                k_list = rawString.split(',').map(s => s.trim()).filter(s => s);
                 let pText = document.querySelector(`.purpose-grid .pill[data-val="${selPurpose}"]`).innerText;
                 let vText = document.querySelector(`.version-grid .pill[data-val="${selVersion}"]`).innerText;
                 searchLabel = `[${pText} / ${vText}]`;
@@ -255,7 +307,7 @@
                 
                 let html = '';
                 if(data.length === 0) {
-                    html = '<div class="no-result">선택하신 조건의 러닝화 재고를 찾지 못했습니다.</div>';
+                    html = '<div class="no-result">No matching shoes found.</div>';
                 } else {
                     data.forEach(item => {
                         let bg = '#64748b';
@@ -278,12 +330,12 @@
                     });
                 }
                 brd.innerHTML = html;
-                stat.innerText = '✅ ' + data.length + '개의 상품 스캔 완료!';
+                stat.innerText = '✅ ' + data.length + ' item(s) found!';
                 stat.style.color = '#10b981';
             })
             .catch((err) => {
                 clearInterval(progInt); pCont.style.display = 'none';
-                stat.innerText = (err.name === 'AbortError') ? '🛑 스캔 취소됨' : '🔴 오류가 발생했습니다.';
+                stat.innerText = (err.name === 'AbortError') ? '🛑 Scan Stopped' : '🔴 Error occurred!';
                 stat.style.color = '#ef4444';
             })
             .finally(() => {

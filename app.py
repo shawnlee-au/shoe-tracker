@@ -8,30 +8,70 @@ else: ssl._create_default_https_context = _create_unverified_https_context
 
 app = Flask(__name__)
 
+DB_FILE = 'shoe_db.json'
+DEFAULT_DB = {
+    "daily": {
+        "latest": "Novablast 4, Pegasus 41, Clifton 9, 880 v14, Ghost 16",
+        "value": "Novablast 3, Pegasus 40, Clifton 8, 880 v13, Ghost 15"
+    },
+    "max": {
+        "latest": "Nimbus 26, 1080 v13, Bondi 8, Invincible 3, Ghost Max",
+        "value": "Nimbus 25, 1080 v12, Bondi 7, Invincible 2"
+    },
+    "racing": {
+        "latest": "Vaporfly 3, Alphafly 3, Metaspeed Sky, Endorphin Pro 4",
+        "value": "Vaporfly 2, Alphafly 2, Endorphin Pro 3"
+    },
+    "super": {
+        "latest": "Superblast 2, Mach X 2, SC Trainer v3, Endorphin Speed 4",
+        "value": "Superblast, Mach X, SC Trainer v2, Endorphin Speed 3"
+    }
+}
+
+def get_db():
+    if os.path.exists(DB_FILE):
+        try:
+            with open(DB_FILE, 'r', encoding='utf-8') as f: return json.load(f)
+        except: pass
+    return DEFAULT_DB
+
+@app.route('/api/config', methods=['GET', 'POST'])
+def config_api():
+    if request.method == 'POST':
+        new_data = request.get_json(silent=True)
+        if new_data:
+            with open(DB_FILE, 'w', encoding='utf-8') as f:
+                json.dump(new_data, f, ensure_ascii=False)
+            return jsonify({"status": "ok"})
+    return jsonify(get_db())
+
 def scan_store(name, url_base, kw, gender, size_num):
     res = []
     seen_titles = set()
     try:
         url_base = url_base.rstrip('/')
-        search_term = kw.replace(' ', '+') if kw.strip() else "running+shoes"
+        words = kw.strip().split()
+        search_term = words[0] if words else "running+shoes"
         search_url = f"{url_base}/search?q={search_term}"
         
         req = urllib.request.Request(search_url, headers={'User-Agent': 'Mozilla/5.0'})
-        html = urllib.request.urlopen(req, timeout=8).read().decode('utf-8')
+        html = urllib.request.urlopen(req, timeout=10).read().decode('utf-8')
         handles = list(dict.fromkeys(re.findall(r'href="[^"]*/products/([^"?/#]+)', html)))
         
-        kl = kw.lower().strip()
+        kl_words = [w.lower() for w in words]
         target_f = float(size_num)
         
-        for h in handles[:20]:
+        for h in handles[:25]:
             try:
                 p_url = f"{url_base}/products/{h}"
                 j_req = urllib.request.Request(f"{p_url}.js", headers={'User-Agent': 'Mozilla/5.0'})
-                j_data = json.loads(urllib.request.urlopen(j_req, timeout=4).read().decode('utf-8'))
+                j_data = json.loads(urllib.request.urlopen(j_req, timeout=5).read().decode('utf-8'))
                 t = j_data.get('title', h)
-                tl = t.lower()
+                tl = t.lower().replace('-', ' ')
                 
-                if kl and kl not in tl: continue
+                # 유연한 키워드 매칭: 띄어쓰기 무시 및 부분 단어 확인
+                if kl_words and not all(w in tl for w in kl_words): continue
+                
                 is_womens_shoe = 'women' in tl or 'wmns' in tl
                 is_unisex_shoe = 'unisex' in tl
                 
@@ -87,9 +127,11 @@ def scan_api():
         stores = req.get('stores', [])
         
         if not k_list: k_list = ['']
+        k_list = [k.strip() for k in k_list if k.strip()]
 
         data = []
-        with ThreadPoolExecutor(max_workers=15) as executor:
+        # Shopify 차단 방지를 위해 최대 스레드를 5개로 제한
+        with ThreadPoolExecutor(max_workers=5) as executor:
             futures = []
             for s in stores:
                 for kw in k_list:
