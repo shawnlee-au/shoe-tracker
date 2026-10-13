@@ -50,15 +50,24 @@ def scan_store(name, url_base, kw, gender, size_num):
         kl_words = [w.lower() for w in kw.split()]
         target_f = float(size_num)
         
+        fetch_count = 0
         for h in handles:
             hl = h.lower().replace('-', ' ')
+            
+            # 1. 키워드가 있으면 URL 필터링 (불필요한 접속 차단)
             if kl_words and not all(w in hl for w in kl_words):
                 continue
+                
+            # 🔥 2. 과부하 및 봇 차단 방지 (빈칸 검색 시 스토어당 최대 25개까지만 안전하게 검사)
+            if fetch_count >= 25:
+                break
                 
             try:
                 p_url = f"{url_base}/products/{h}"
                 j_req = urllib.request.Request(f"{p_url}.js", headers=headers)
                 j_data = json.loads(urllib.request.urlopen(j_req, timeout=5).read().decode('utf-8'))
+                fetch_count += 1
+                
                 t = j_data.get('title', h)
                 tl = t.lower()
                 
