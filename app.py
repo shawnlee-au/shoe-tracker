@@ -40,8 +40,10 @@ def scan_store(name, url_base, kw, gender, size_num):
     try:
         url_base = url_base.rstrip('/')
         kw = kw.strip()
-        search_term = urllib.parse.quote(kw) if kw else "running shoes"
-        search_url = f"{url_base}/search?q={search_term}&type=product"
+        
+        # 🔥 치명적 오류 수정: 띄어쓰기를 안전한 URL 형태(+)로 자동 변환 
+        search_term = urllib.parse.quote_plus(kw) if kw else "running+shoes"
+        search_url = f"{url_base}/search?q={search_term}"
         
         req = urllib.request.Request(search_url, headers=headers)
         html = urllib.request.urlopen(req, timeout=8).read().decode('utf-8')
@@ -54,12 +56,12 @@ def scan_store(name, url_base, kw, gender, size_num):
         for h in handles:
             hl = h.lower().replace('-', ' ')
             
-            # 1. 키워드가 있으면 URL 필터링 (불필요한 접속 차단)
+            # 1. 특정 키워드 검색 시 URL 이름으로 필터링
             if kl_words and not all(w in hl for w in kl_words):
                 continue
                 
-            # 🔥 2. 과부하 및 봇 차단 방지 (빈칸 검색 시 스토어당 최대 25개까지만 안전하게 검사)
-            if fetch_count >= 25:
+            # 2. 빈칸 검색(전체 조회) 시 서버 과부하를 막기 위해 최대 30개까지만 검사
+            if fetch_count >= 30:
                 break
                 
             try:
