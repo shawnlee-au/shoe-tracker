@@ -41,9 +41,13 @@ def scan_store(name, url_base, kw, gender, size_num):
         url_base = url_base.rstrip('/')
         kw = kw.strip()
         
-        # 🔥 치명적 오류 수정: 띄어쓰기를 안전한 URL 형태(+)로 자동 변환 
-        search_term = urllib.parse.quote_plus(kw) if kw else "running+shoes"
-        search_url = f"{url_base}/search?q={search_term}"
+        # 🔥 해결 핵심: USW(여성용) 선택 시 스토어 검색 엔진에 'womens'를 몰래 강제 추가
+        if gender == 'USW':
+            search_term = urllib.parse.quote_plus(f"{kw} womens".strip()) if kw else "womens+running+shoes"
+        else:
+            search_term = urllib.parse.quote_plus(f"{kw} mens".strip()) if kw else "mens+running+shoes"
+            
+        search_url = f"{url_base}/search?q={search_term}&type=product"
         
         req = urllib.request.Request(search_url, headers=headers)
         html = urllib.request.urlopen(req, timeout=8).read().decode('utf-8')
@@ -56,12 +60,12 @@ def scan_store(name, url_base, kw, gender, size_num):
         for h in handles:
             hl = h.lower().replace('-', ' ')
             
-            # 1. 특정 키워드 검색 시 URL 이름으로 필터링
+            # 검색창에 직접 입력한 원래 키워드만 필터링에 사용
             if kl_words and not all(w in hl for w in kl_words):
                 continue
                 
-            # 2. 빈칸 검색(전체 조회) 시 서버 과부하를 막기 위해 최대 30개까지만 검사
-            if fetch_count >= 30:
+            # 안전 버퍼 상향 (30 -> 45) : 결과량을 더 풍부하게 가져옴
+            if fetch_count >= 45:
                 break
                 
             try:
