@@ -1,4 +1,4 @@
-import os, json, urllib.request, re, ssl, urllib.parse
+import os, json, urllib.request, re, ssl, urllib.parse, time
 from flask import Flask, request, jsonify, render_template
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -33,87 +33,91 @@ def config_api():
             return jsonify({"status": "ok"})
     return jsonify(get_db())
 
-def scan_store(name, url_base, kw, gender, size_num):
+def process_store_keywords(name, url_base, k_list, gender, size_num):
     res = []
     seen_titles = set()
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-    try:
-        url_base = url_base.rstrip('/')
-        kw = kw.strip()
-        
-        # 🔥 키워드가 있을 때는 강제 성별(mens/womens) 추가 없이 원본 검색 (Unisex 레이싱화 누락 방지)
-        if kw:
-            search_term = urllib.parse.quote_plus(kw)
-        else:
-            search_term = "womens+running+shoes" if gender == 'USW' else "running+shoes"
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/json,*/*',
+    }
+    url_base = url_base.rstrip('/')
+    target_f = float(size_num)
+    
+    for kw in k_list:
+        try:
+            if kw:
+                search_term = urllib.parse.quote_plus(kw)
+            else:
+                search_term = "womens+running+shoes" if gender == 'USW' else "running+shoes"
+                
+            search_url = f"{url_base}/search?q={search_term}&type=product"
+            req = urllib.request.Request(search_url, headers=headers)
+            html = urllib.request.urlopen(req, timeout=10).read().decode('utf-8')
+            handles = list(dict.fromkeys(re.findall(r'href="[^"]*/products/([^"?/#]+)', html)))
+            kl_words = [w.lower() for w in kw.split()]
             
-        search_url = f"{url_base}/search?q={search_term}&type=product"
-        
-        req = urllib.request.Request(search_url, headers=headers)
-        html = urllib.request.urlopen(req, timeout=8).read().decode('utf-8')
-        handles = list(dict.fromkeys(re.findall(r'href="[^"]*/products/([^"?/#]+)', html)))
-        
-        kl_words = [w.lower() for w in kw.split()]
-        target_f = float(size_num)
-        
-        fetch_count = 0
-        for h in handles:
-            hl = h.lower().replace('-', ' ')
-            
-            if kl_words and not all(w in hl for w in kl_words):
-                continue
-                
-            if fetch_count >= 45:
-                break
-                
-            try:
-                p_url = f"{url_base}/products/{h}"
-                j_req = urllib.request.Request(f"{p_url}.js", headers=headers)
-                j_data = json.loads(urllib.request.urlopen(j_req, timeout=5).read().decode('utf-8'))
-                fetch_count += 1
-                
-                t = j_data.get('title', h)
-                tl = t.lower()
-                
-                is_womens_shoe = 'women' in tl or 'wmns' in tl
-                is_unisex_shoe = 'unisex' in tl
-                
-                if gender == 'USM' and is_womens_shoe: continue
-                if gender == 'USW' and not is_womens_shoe and not is_unisex_shoe and ('men' in tl): continue
-                if 'wide' in tl or '2e' in tl or '4e' in tl: continue
-                if tl in seen_titles: continue
-                
-                for v in j_data.get('variants', []):
-                    if not v.get('available'): continue
-                    v_title = v.get('title', '')
-                    clean_title = re.sub(r'(UK|EU|EUR|CM|MM)\s*\d+(\.\d+)?', '', v_title, flags=re.IGNORECASE)
-                    clean_title = re.sub(r'\d+(\.\d+)?\s*(UK|EU|EUR|CM|MM)', '', clean_title, flags=re.IGNORECASE)
-                    v_nums_str = re.findall(r'\d+\.?\d*', clean_title)
-                    if not v_nums_str: continue
-                        
-                    v_nums = [float(x) for x in v_nums_str]
-                    match = False
+            fetch_count = 0
+            for h in handles:
+                hl = h.lower().replace('-', ' ')
+                if kl_words and not all(w in hl for w in kl_words):
+                    continue
                     
-                    if gender == 'USM':
-                        if v_nums[0] == target_f: match = True
-                    elif gender == 'USW':
-                        if is_womens_shoe:
+                if fetch_count >= 30:
+                    break
+                    
+                try:
+                    p_url = f"{url_base}/products/{h}"
+                    j_req = urllib.request.Request(f"{p_url}.js", headers=headers)
+                    j_data = json.loads(urllib.request.urlopen(j_req, timeout=6).read().decode('utf-8'))
+                    fetch_count += 1
+                    
+                    t = j_data.get('title', h)
+                    tl = t.lower()
+                    
+                    is_womens = 'women' in tl or 'wmns' in tl
+                    is_unisex = 'unisex' in tl
+                    
+                    if gender == 'USM' and is_womens: continue
+                    if gender == 'USW' and not is_womens and not is_unisex and ('men' in tl): continue
+                    if 'wide' in tl or '2e' in tl or '4e' in tl: continue
+                    if tl in seen_titles: continue
+                    
+                    for v in j_data.get('variants', []):
+                        if not v.get('available'): continue
+                        v_title = v.get('title', '')
+                        
+                        clean_title = re.sub(r'(UK|EU|EUR|CM|MM)\s*\d+(\.\d+)?', '', v_title, flags=re.IGNORECASE)
+                        clean_title = re.sub(r'\d+(\.\d+)?\s*(UK|EU|EUR|CM|MM)', '', clean_title, flags=re.IGNORECASE)
+                        v_nums_str = re.findall(r'\d+\.?\d*', clean_title)
+                        if not v_nums_str: continue
+                            
+                        v_nums = [float(x) for x in v_nums_str]
+                        match = False
+                        
+                        if gender == 'USM':
                             if v_nums[0] == target_f: match = True
-                        else:
-                            if len(v_nums) >= 2:
-                                if v_nums[1] == target_f or v_nums[0] == (target_f - 1.5): match = True
+                            elif len(v_nums) >= 2 and min(v_nums[:2]) == target_f: match = True
+                        elif gender == 'USW':
+                            if is_womens:
+                                if v_nums[0] == target_f: match = True
                             else:
-                                if v_nums[0] == (target_f - 1.5): match = True
-                                
-                    if match:
-                        p = float(v.get('price', 0)) / 100
-                        v_id = v.get('id')
-                        final_url = f"{p_url}?variant={v_id}" if v_id else p_url
-                        res.append({"store": name, "title": t, "price": p, "url": final_url})
-                        seen_titles.add(tl)
-                        break
-            except Exception: pass
-    except Exception: pass
+                                if len(v_nums) >= 2:
+                                    if max(v_nums[:2]) == target_f or v_nums[0] == (target_f - 1.5): match = True
+                                else:
+                                    if v_nums[0] == (target_f - 1.5): match = True
+                                    
+                        if match:
+                            p = float(v.get('price', 0)) / 100
+                            v_id = v.get('id')
+                            final_url = f"{p_url}?variant={v_id}" if v_id else p_url
+                            res.append({"store": name, "title": t, "price": p, "url": final_url})
+                            seen_titles.add(tl)
+                            break
+                except: pass
+        except: pass
+        # 스토어 보안망을 우회하기 위한 사람 흉내내기 (0.1초 딜레이)
+        time.sleep(0.1)
+        
     return res
 
 @app.route('/api/scan', methods=['POST'])
@@ -129,11 +133,11 @@ def scan_api():
         if not filtered_k: filtered_k = ['']
 
         data = []
-        with ThreadPoolExecutor(max_workers=8) as executor:
+        # 동시다발적 폭격을 막고 스토어당 1개의 안전한 통로만 사용하도록 제한
+        with ThreadPoolExecutor(max_workers=len(stores)) as executor:
             futures = []
             for s in stores:
-                for kw in filtered_k:
-                    futures.append(executor.submit(scan_store, s['name'], s['url'], kw, gender, size_num))
+                futures.append(executor.submit(process_store_keywords, s['name'], s['url'], filtered_k, gender, size_num))
             for future in as_completed(futures):
                 try: data.extend(future.result())
                 except: pass
