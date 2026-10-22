@@ -41,11 +41,11 @@ def scan_store(name, url_base, kw, gender, size_num):
         url_base = url_base.rstrip('/')
         kw = kw.strip()
         
-        # 🔥 해결 핵심: USW(여성용) 선택 시 스토어 검색 엔진에 'womens'를 몰래 강제 추가
-        if gender == 'USW':
-            search_term = urllib.parse.quote_plus(f"{kw} womens".strip()) if kw else "womens+running+shoes"
+        # 🔥 키워드가 있을 때는 강제 성별(mens/womens) 추가 없이 원본 검색 (Unisex 레이싱화 누락 방지)
+        if kw:
+            search_term = urllib.parse.quote_plus(kw)
         else:
-            search_term = urllib.parse.quote_plus(f"{kw} mens".strip()) if kw else "mens+running+shoes"
+            search_term = "womens+running+shoes" if gender == 'USW' else "running+shoes"
             
         search_url = f"{url_base}/search?q={search_term}&type=product"
         
@@ -60,11 +60,9 @@ def scan_store(name, url_base, kw, gender, size_num):
         for h in handles:
             hl = h.lower().replace('-', ' ')
             
-            # 검색창에 직접 입력한 원래 키워드만 필터링에 사용
             if kl_words and not all(w in hl for w in kl_words):
                 continue
                 
-            # 안전 버퍼 상향 (30 -> 45) : 결과량을 더 풍부하게 가져옴
             if fetch_count >= 45:
                 break
                 
