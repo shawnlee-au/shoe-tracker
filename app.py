@@ -37,7 +37,7 @@ def process_store_keywords(name, url_base, k_list, gender, size_num):
     res = []
     seen_titles = set()
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
         'Accept': 'text/html,application/json,*/*',
     }
     url_base = url_base.rstrip('/')
@@ -53,13 +53,25 @@ def process_store_keywords(name, url_base, k_list, gender, size_num):
             search_url = f"{url_base}/search?q={search_term}&type=product"
             req = urllib.request.Request(search_url, headers=headers)
             html = urllib.request.urlopen(req, timeout=10).read().decode('utf-8')
-            handles = list(dict.fromkeys(re.findall(r'href="[^"]*/products/([^"?/#]+)', html)))
-            kl_words = [w.lower() for w in kw.split()]
+            
+            # 1. 일반적인 검색 결과 페이지 내의 상품 링크 추출
+            handles = list(dict.fromkeys(re.findall(r'href=['"][^'"]*/products/([^'"?/#]+)', html)))
+            
+            # 2. 쇼피파이 Exact Match Redirect 방어 (상품 페이지로 바로 떨어진 경우)
+            canonical = re.search(r'<link rel="canonical" href="[^'"]*/products/([^'"?/#]+)', html)
+            if canonical:
+                handles.insert(0, canonical.group(1))
+                
+            handles = list(dict.fromkeys(handles))
+            
+            # 검색어 띄어쓰기 및 하이픈 무시 (예: metaspeed == meta-speed)
+            kw_compact = kw.lower().replace(' ', '').replace('-', '')
             
             fetch_count = 0
             for h in handles:
-                hl = h.lower().replace('-', ' ')
-                if kl_words and not all(w in hl for w in kl_words):
+                hl_compact = h.lower().replace('-', '')
+                
+                if kw_compact and kw_compact not in hl_compact:
                     continue
                     
                 if fetch_count >= 30:
@@ -84,8 +96,8 @@ def process_store_keywords(name, url_base, k_list, gender, size_num):
                     
                     for v in j_data.get('variants', []):
                         if not v.get('available'): continue
-                        v_title = v.get('title', '')
                         
+                        v_title = v.get('title', '')
                         clean_title = re.sub(r'(UK|EU|EUR|CM|MM)\s*\d+(\.\d+)?', '', v_title, flags=re.IGNORECASE)
                         clean_title = re.sub(r'\d+(\.\d+)?\s*(UK|EU|EUR|CM|MM)', '', clean_title, flags=re.IGNORECASE)
                         v_nums_str = re.findall(r'\d+\.?\d*', clean_title)
@@ -115,7 +127,6 @@ def process_store_keywords(name, url_base, k_list, gender, size_num):
                             break
                 except: pass
         except: pass
-        # 스토어 보안망을 우회하기 위한 사람 흉내내기 (0.1초 딜레이)
         time.sleep(0.1)
         
     return res
@@ -133,7 +144,6 @@ def scan_api():
         if not filtered_k: filtered_k = ['']
 
         data = []
-        # 동시다발적 폭격을 막고 스토어당 1개의 안전한 통로만 사용하도록 제한
         with ThreadPoolExecutor(max_workers=len(stores)) as executor:
             futures = []
             for s in stores:
