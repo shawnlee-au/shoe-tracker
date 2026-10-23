@@ -36,51 +36,51 @@ def config_api():
 def process_store_keywords(name, url_base, k_list, gender, size_num):
     res = []
     seen_titles = set()
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-        'Accept': 'text/html,application/json,*/*',
-    }
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
     url_base = url_base.rstrip('/')
     target_f = float(size_num)
     
     for kw in k_list:
         try:
-            if kw:
-                search_term = urllib.parse.quote_plus(kw)
-            else:
-                search_term = "womens+running+shoes" if gender == 'USW' else "running+shoes"
-                
-            search_url = f"{url_base}/search?q={search_term}&type=product"
-            req = urllib.request.Request(search_url, headers=headers)
-            html = urllib.request.urlopen(req, timeout=10).read().decode('utf-8')
+            search_term = urllib.parse.quote_plus(kw) if kw else ("womens+running+shoes" if gender == 'USW' else "running+shoes")
+            handles = []
             
-            # 1. 일반적인 검색 결과 페이지 내의 상품 링크 추출
-            handles = list(dict.fromkeys(re.findall(r'href=['"][^'"]*/products/([^'"?/#]+)', html)))
+            # 1. 쇼피파이 내부 AJAX API 직접 통신 (JS 렌더링 무시하고 원본 데이터 추출)
+            try:
+                s_url = f"{url_base}/search/suggest.json?q={search_term}&resources[type]=product"
+                s_req = urllib.request.Request(s_url, headers=headers)
+                s_data = json.loads(urllib.request.urlopen(s_req, timeout=4).read().decode('utf-8'))
+                for p in s_data.get('resources', {}).get('results', {}).get('products', []):
+                    if p.get('handle'): handles.append(p.get('handle'))
+            except: pass
             
-            # 2. 쇼피파이 Exact Match Redirect 방어 (상품 페이지로 바로 떨어진 경우)
-            canonical = re.search(r'<link rel="canonical" href="[^'"]*/products/([^'"?/#]+)', html)
-            if canonical:
-                handles.insert(0, canonical.group(1))
-                
-            handles = list(dict.fromkeys(handles))
+            # 2. HTML 정규식 추출 (안전 백업망)
+            try:
+                search_url = f"{url_base}/search?q={search_term}&type=product"
+                req = urllib.request.Request(search_url, headers=headers)
+                html = urllib.request.urlopen(req, timeout=6).read().decode('utf-8')
+                handles.extend(re.findall(r'/products/([a-zA-Z0-9\-]+)', html))
+                handles.extend(re.findall(r'"handle"\s*:\s*"([a-zA-Z0-9\-]+)"', html))
+            except: pass
             
-            # 검색어 띄어쓰기 및 하이픈 무시 (예: metaspeed == meta-speed)
-            kw_compact = kw.lower().replace(' ', '').replace('-', '')
+            handles = list(dict.fromkeys([h for h in handles if h and len(h) > 3]))
+            kl_words = [w.lower() for w in kw.split()]
             
             fetch_count = 0
             for h in handles:
-                hl_compact = h.lower().replace('-', '')
+                hl = h.lower().replace('-', ' ')
                 
-                if kw_compact and kw_compact not in hl_compact:
+                # 분리된 단어(예: meta speed) 매칭 허용
+                if kl_words and not all(w in hl for w in kl_words):
                     continue
                     
-                if fetch_count >= 30:
+                if fetch_count >= 50:
                     break
                     
                 try:
                     p_url = f"{url_base}/products/{h}"
                     j_req = urllib.request.Request(f"{p_url}.js", headers=headers)
-                    j_data = json.loads(urllib.request.urlopen(j_req, timeout=6).read().decode('utf-8'))
+                    j_data = json.loads(urllib.request.urlopen(j_req, timeout=4).read().decode('utf-8'))
                     fetch_count += 1
                     
                     t = j_data.get('title', h)
